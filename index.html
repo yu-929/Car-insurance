@@ -648,6 +648,9 @@
             const currentRate = this.textContent;
             if (currentRate && currentRate !== '暂无数据') {
                 newRateInput.value = currentRate;
+                // 获取当前备注并填入
+                const currentNote = document.getElementById('resultNote').textContent;
+                reportNote.value = currentNote ? currentNote.replace('备注信息：', '') : '';
                 reportModal.classList.add('active');
             }
         });
