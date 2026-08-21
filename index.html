@@ -92,13 +92,17 @@
             gap: 20px;
         }
         
+        .form-row.three-col {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+        
         .form-group.small {
-            max-width: 120px;
+            max-width: 150px;
         }
         
         .form-group.small select {
-            padding: 8px 10px;
-            font-size: 0.9em;
+            padding: 10px 12px;
+            font-size: 0.95em;
         }
         
         .submit-btn {
@@ -215,7 +219,7 @@
         
         <div class="content">
             <form class="query-form" id="insuranceForm">
-                <div class="form-row" style="grid-template-columns: 1fr 2fr;">
+                <div class="form-row">
                     <div class="form-group small">
                         <label for="insuranceCompany">投保公司</label>
                         <select id="insuranceCompany" required>
@@ -255,11 +259,11 @@
                     </div>
                 </div>
                 
-                <div class="form-row">
+                <div class="form-row three-col">
                     <div class="form-group">
                         <label for="businessType">业务类型</label>
                         <select id="businessType" required>
-                            <option value="">请选择业务类型</option>
+                            <option value="">请选择</option>
                             <option value="转保">转保</option>
                             <option value="续保">续保</option>
                             <option value="新车">新车</option>
@@ -268,29 +272,23 @@
                     <div class="form-group">
                         <label for="insuranceType">保险类型</label>
                         <select id="insuranceType" required>
-                            <option value="">请选择保险类型</option>
+                            <option value="">请选择</option>
                             <option value="单交">单交</option>
                             <option value="单商">单商</option>
                             <option value="交商【含损】">交商【含损】</option>
                             <option value="交商【不含损】">交商【不含损】</option>
                         </select>
                     </div>
-                </div>
-                
-                <div class="form-row">
                     <div class="form-group">
                         <label for="vehicleType">车辆类型</label>
                         <select id="vehicleType" required>
-                            <option value="">请选择车辆类型</option>
+                            <option value="">请选择</option>
                             <option value="家自车">家自车</option>
                             <option value="家自车【新能源】">家自车【新能源】</option>
                             <option value="营运货车">营运货车</option>
                             <option value="非营运货车">非营运货车</option>
                             <option value="特种车">特种车</option>
                         </select>
-                    </div>
-                    <div class="form-group">
-                        <!-- 占位，保持布局一致 -->
                     </div>
                 </div>
                 
