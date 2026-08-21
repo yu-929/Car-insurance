@@ -605,6 +605,20 @@
                             <option value="是">是</option>
                         </select>
                     </div>
+                    <div class="field" id="hasCarAccidentField" style="display:none;">
+                        <label for="hasCarAccident">是否含车驾意</label>
+                        <select id="hasCarAccident">
+                            <option value="否">否</option>
+                            <option value="是">是</option>
+                        </select>
+                    </div>
+                    <div class="field" id="hasPersonnelField" style="display:none;">
+                        <label for="hasPersonnel">是否含人员</label>
+                        <select id="hasPersonnel">
+                            <option value="否">否</option>
+                            <option value="是">是</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="actions">
@@ -738,21 +752,50 @@
             const company = this.value;
             const citySelect = document.getElementById('city');
             const vehicleTypeSelect = document.getElementById('vehicleType');
+            const hasCarAccidentField = document.getElementById('hasCarAccidentField');
+            const hasPersonnelField = document.getElementById('hasPersonnelField');
 
             if (company === '华海') {
                 applyOptionFilter(citySelect, huahaiExcludedCities);
                 applyOptionFilter(vehicleTypeSelect, huahaiExcludedVehicleTypes);
                 citySelect.value = '商丘';
+                hasCarAccidentField.style.display = 'none';
+                hasPersonnelField.style.display = 'none';
             } else if (company === '国任') {
                 applyOptionFilter(citySelect, [], guorenCities);
                 applyOptionFilter(vehicleTypeSelect, [], guorenVehicleTypes);
                 citySelect.value = '郑州';
                 vehicleTypeSelect.value = '非营运客车';
+                hasCarAccidentField.style.display = 'none';
+                hasPersonnelField.style.display = 'none';
+            } else if (company === '锦泰') {
+                applyOptionFilter(citySelect, []);
+                applyOptionFilter(vehicleTypeSelect, []);
+                citySelect.value = '';
+                vehicleTypeSelect.value = '';
+                hasCarAccidentField.style.display = 'block';
+                hasPersonnelField.style.display = 'none';
             } else {
                 applyOptionFilter(citySelect, []);
                 applyOptionFilter(vehicleTypeSelect, []);
                 citySelect.value = '';
                 vehicleTypeSelect.value = '';
+                hasCarAccidentField.style.display = 'none';
+                hasPersonnelField.style.display = 'none';
+            }
+        });
+
+        // 车辆类型变化时控制是否含人员字段
+        document.getElementById('vehicleType').addEventListener('change', function () {
+            const company = document.getElementById('insuranceCompany').value;
+            const vehicleType = this.value;
+            const hasPersonnelField = document.getElementById('hasPersonnelField');
+
+            if (company === '锦泰' && vehicleType === '特种车') {
+                hasPersonnelField.style.display = 'block';
+            } else {
+                hasPersonnelField.style.display = 'none';
+                document.getElementById('hasPersonnel').value = '否';
             }
         });
 
@@ -814,6 +857,8 @@
             const insuranceType = document.getElementById('insuranceType').value;
             const vehicleType = document.getElementById('vehicleType').value;
             const isTransfer = document.getElementById('isTransfer').value;
+            const hasCarAccident = document.getElementById('hasCarAccident').value;
+            const hasPersonnel = document.getElementById('hasPersonnel').value;
 
             const rateInfo = getRateInfo(insuranceCompany, city, businessType, insuranceType, vehicleType, isTransfer);
 
@@ -844,6 +889,14 @@
                 ['车辆类型', vehicleType],
                 ['是否过户', isTransfer]
             ];
+
+            // 锦泰显示额外条件
+            if (insuranceCompany === '锦泰') {
+                items.push(['是否含车驾意', hasCarAccident]);
+                if (vehicleType === '特种车') {
+                    items.push(['是否含人员', hasPersonnel]);
+                }
+            }
 
             document.getElementById('resultList').innerHTML = items
                 .map(function (item) {
