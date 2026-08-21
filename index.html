@@ -763,16 +763,15 @@
             if (company === '华海') {
                 applyOptionFilter(citySelect, huahaiExcludedCities);
                 applyOptionFilter(vehicleTypeSelect, huahaiExcludedVehicleTypes);
+                citySelect.value = '商丘';
             } else if (company === '国任') {
                 applyOptionFilter(citySelect, [], guorenCities);
                 applyOptionFilter(vehicleTypeSelect, [], guorenVehicleTypes);
+                citySelect.value = '郑州';
                 vehicleTypeSelect.value = '非营运客车';
             } else {
                 applyOptionFilter(citySelect, []);
                 applyOptionFilter(vehicleTypeSelect, []);
-            }
-
-            if (company !== '国任') {
                 citySelect.value = '';
                 vehicleTypeSelect.value = '';
             }
