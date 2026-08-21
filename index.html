@@ -858,7 +858,7 @@
             });
         }
 
-        document.getElementById('insuranceForm').addEventListener('submit', function (e) {
+        document.getElementById('insuranceForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
             const insuranceCompany = document.getElementById('insuranceCompany').value;
@@ -869,6 +869,25 @@
             const isTransfer = document.getElementById('isTransfer').value;
 
             const rateInfo = getRateInfo(insuranceCompany, city, businessType, insuranceType, vehicleType, isTransfer);
+
+            // 从数据库获取最新备注
+            let displayNote = rateInfo.note;
+            try {
+                const params = new URLSearchParams({
+                    company: insuranceCompany,
+                    city: city,
+                    vehicleType: vehicleType,
+                    businessType: businessType,
+                    insuranceType: insuranceType
+                });
+                const response = await fetch('/api/latest-note?' + params.toString());
+                const data = await response.json();
+                if (data.note) {
+                    displayNote = data.note;
+                }
+            } catch (error) {
+                // 获取失败时使用默认备注
+            }
 
             const items = [
                 ['投保公司', insuranceCompany],
@@ -887,7 +906,7 @@
                 .join('');
 
             document.getElementById('resultRate').textContent = rateInfo.rate;
-            document.getElementById('resultNote').textContent = rateInfo.note ? '备注信息：' + rateInfo.note : '';
+            document.getElementById('resultNote').textContent = displayNote ? '备注信息：' + displayNote : '';
 
             const resultSection = document.getElementById('resultSection');
             resultSection.style.display = 'block';
