@@ -208,6 +208,19 @@
             <form class="query-form" id="insuranceForm">
                 <div class="form-row">
                     <div class="form-group">
+                        <label for="insuranceCompany">投保公司</label>
+                        <select id="insuranceCompany" required>
+                            <option value="">请选择投保公司</option>
+                            <option value="华海">华海</option>
+                            <option value="燕赵">燕赵</option>
+                            <option value="锦泰">锦泰</option>
+                            <option value="利宝">利宝</option>
+                            <option value="申能">申能</option>
+                            <option value="恒邦">恒邦</option>
+                            <option value="国任">国任</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="city">投保城市</label>
                         <select id="city" required>
                             <option value="">请选择投保城市</option>
@@ -231,17 +244,6 @@
                             <option value="济源">济源</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="vehicleType">车辆类型</label>
-                        <select id="vehicleType" required>
-                            <option value="">请选择车辆类型</option>
-                            <option value="家自车">家自车</option>
-                            <option value="家自车【新能源】">家自车【新能源】</option>
-                            <option value="营运货车">营运货车</option>
-                            <option value="非营运货车">非营运货车</option>
-                            <option value="特种车">特种车</option>
-                        </select>
-                    </div>
                 </div>
                 
                 <div class="form-row">
@@ -256,8 +258,15 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="coverageAmount">保额（万元）</label>
-                        <input type="number" id="coverageAmount" placeholder="例如：100" min="1" max="500" required>
+                        <label for="vehicleType">车辆类型</label>
+                        <select id="vehicleType" required>
+                            <option value="">请选择车辆类型</option>
+                            <option value="家自车">家自车</option>
+                            <option value="家自车【新能源】">家自车【新能源】</option>
+                            <option value="营运货车">营运货车</option>
+                            <option value="非营运货车">非营运货车</option>
+                            <option value="特种车">特种车</option>
+                        </select>
                     </div>
                 </div>
                 
@@ -304,22 +313,22 @@
         document.getElementById('insuranceForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            const insuranceCompany = document.getElementById('insuranceCompany').value;
             const city = document.getElementById('city').value;
-            const vehicleType = document.getElementById('vehicleType').value;
             const insuranceType = document.getElementById('insuranceType').value;
-            const coverageAmount = document.getElementById('coverageAmount').value;
+            const vehicleType = document.getElementById('vehicleType').value;
             const queryDetails = document.getElementById('queryDetails').value;
             
             // 模拟查询结果
             const resultContent = `
+                <p><strong>投保公司：</strong>${insuranceCompany}</p>
                 <p><strong>投保城市：</strong>${city}</p>
-                <p><strong>车辆类型：</strong>${vehicleType}</p>
                 <p><strong>保险类型：</strong>${insuranceType}</p>
-                <p><strong>保额：</strong>${coverageAmount}万元</p>
+                <p><strong>车辆类型：</strong>${vehicleType}</p>
                 <p><strong>查询详情：</strong>${queryDetails || '无'}</p>
                 <hr style="margin: 15px 0; border: 1px solid #eee;">
-                <p><strong>推荐方案：</strong>根据您在${city}的${vehicleType}投保需求，我们推荐选择${insuranceType}方案，保额${coverageAmount}万元。</p>
-                <p><strong>预估保费：</strong>约${calculatePremium(insuranceType, coverageAmount)}元/年</p>
+                <p><strong>推荐方案：</strong>根据您在${city}通过${insuranceCompany}投保${vehicleType}的需求，我们推荐选择${insuranceType}方案。</p>
+                <p><strong>预估保费：</strong>约${calculatePremium(insuranceType)}元/年</p>
                 <p><strong>备注：</strong>以上为参考价格，具体保费以保险公司实际核保为准。</p>
             `;
             
@@ -335,7 +344,7 @@
             return type;
         }
         
-        function calculatePremium(type, amount) {
+        function calculatePremium(type) {
             // 简单的保费计算模拟
             let basePremium = 0;
             switch(type) {
