@@ -6,18 +6,44 @@
     <title>小钱Car-insurance查询</title>
     <style>
         :root {
+            /* 文字 · 规格：ink / body-on-dark / body-muted / ink-muted */
             --color-text: #1d1d1f;
+            --color-text-on-dark: #ffffff;
+            --color-text-muted-on-dark: #cccccc;
+            /* 次级与说明文字，按站点内容适配 */
             --color-text-secondary: #6e6e73;
             --color-text-tertiary: #86868b;
+
+            /* 表面 · 规格：canvas / parchment / pearl */
             --color-bg: #ffffff;
             --color-bg-subtle: #f5f5f7;
-            --color-border: #d2d2d7;
-            --color-accent: #0071e3;
-            --color-accent-hover: #0077ed;
+            --color-surface-pearl: #fafafc;
+            --color-surface-black: #000000;
+
+            /* 边框 · 规格：hairline / divider-soft */
+            --color-border: #e0e0e0;
+            --color-hairline-soft: rgba(0, 0, 0, 0.08);
+            --color-divider-soft: rgba(0, 0, 0, 0.04);
+
+            /* 交互 · 规格：Action Blue / Focus Blue / Sky Link Blue */
+            --color-primary: #0066cc;
+            --color-primary-focus: #0071e3;
+            --color-primary-on-dark: #2997ff;
+
+            /* 字体 · 规格：Display 与 Text 双栈 */
+            --font-display: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display',
+                'PingFang SC', 'Microsoft YaHei', sans-serif;
+            --font-text: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text',
+                'PingFang SC', 'Microsoft YaHei', sans-serif;
+
+            /* 圆角 · 规格：8 / 11 / 18 / pill */
             --radius-sm: 8px;
-            --radius-md: 12px;
+            --radius-md: 11px;
             --radius-lg: 18px;
-            --radius-pill: 980px;
+            --radius-pill: 9999px;
+
+            /* 阴影 · 全系统唯一一条，仅费率结果卡使用 */
+            --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0;
         }
 
         * {
@@ -32,11 +58,10 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
-                'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            font-family: var(--font-text);
             background: var(--color-bg);
             color: var(--color-text);
-            line-height: 1.47059;
+            line-height: 1.47;
             letter-spacing: -0.022em;
         }
 
@@ -87,10 +112,11 @@
         }
 
         .hero h1 {
+            font-family: var(--font-display);
             font-size: 56px;
-            line-height: 1.07143;
+            line-height: 1.07;
             font-weight: 600;
-            letter-spacing: -0.005em;
+            letter-spacing: -0.28px;
             margin-bottom: 16px;
         }
 
@@ -115,6 +141,7 @@
         }
 
         .panel-title {
+            font-family: var(--font-display);
             font-size: 24px;
             font-weight: 600;
             letter-spacing: 0.009em;
@@ -160,23 +187,19 @@
             letter-spacing: -0.022em;
             color: var(--color-text);
             background-color: var(--color-bg);
-            border: 1px solid var(--color-border);
+            border: 1px solid var(--color-hairline-soft);
             border-radius: var(--radius-md);
             cursor: pointer;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            transition: border-color 0.2s ease;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 14px center;
         }
 
-        .field select:hover {
-            border-color: #b0b0b5;
-        }
-
-        .field select:focus {
-            outline: none;
-            border-color: var(--color-accent);
-            box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15);
+        .field select:focus-visible {
+            outline: 2px solid var(--color-primary-focus);
+            outline-offset: 2px;
+            border-color: var(--color-primary);
         }
 
         .actions {
@@ -193,29 +216,30 @@
             font-size: 17px;
             font-weight: 400;
             letter-spacing: -0.022em;
-            color: #ffffff;
-            background: var(--color-accent);
+            color: var(--color-text-on-dark);
+            background: var(--color-primary);
             border: none;
             border-radius: var(--radius-pill);
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: transform 0.2s ease;
         }
 
-        .btn:hover {
-            background: var(--color-accent-hover);
+        .btn:focus-visible {
+            outline: 2px solid var(--color-primary-focus);
+            outline-offset: 3px;
         }
 
         .btn:active {
-            opacity: 0.85;
+            transform: scale(0.95);
         }
 
         .result {
             display: none;
             margin-top: 28px;
             background: var(--color-bg);
-            border: 1px solid var(--color-border);
             border-radius: var(--radius-lg);
             padding: 36px 40px;
+            box-shadow: var(--shadow-product);
             animation: rise 0.5s cubic-bezier(0.28, 0.11, 0.32, 1);
         }
 
@@ -231,6 +255,7 @@
         }
 
         .result h2 {
+            font-family: var(--font-display);
             font-size: 24px;
             font-weight: 600;
             letter-spacing: 0.009em;
@@ -264,7 +289,7 @@
 
         .result-item .val {
             font-size: 17px;
-            font-weight: 500;
+            font-weight: 600;
             letter-spacing: -0.022em;
             text-align: right;
         }
@@ -293,9 +318,9 @@
         .result-note {
             margin-top: 16px;
             font-size: 14px;
-            line-height: 1.42859;
+            line-height: 1.43;
             color: var(--color-text-secondary);
-            letter-spacing: -0.016em;
+            letter-spacing: -0.224px;
         }
 
         .features {
@@ -312,6 +337,7 @@
         }
 
         .feature-title {
+            font-family: var(--font-display);
             font-size: 19px;
             font-weight: 600;
             letter-spacing: 0.012em;
@@ -320,9 +346,9 @@
 
         .feature-desc {
             font-size: 14px;
-            line-height: 1.42859;
+            line-height: 1.43;
             color: var(--color-text-secondary);
-            letter-spacing: -0.016em;
+            letter-spacing: -0.224px;
         }
 
         .footer {
