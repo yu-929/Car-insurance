@@ -92,6 +92,15 @@
             gap: 20px;
         }
         
+        .form-group.small {
+            max-width: 120px;
+        }
+        
+        .form-group.small select {
+            padding: 8px 10px;
+            font-size: 0.9em;
+        }
+        
         .submit-btn {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             color: white;
@@ -200,17 +209,17 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>小钱-车险政策查询</h1>
+            <h1>小钱Car-insurance查询</h1>
             <p>快速查询最新车险政策，获取专业建议</p>
         </div>
         
         <div class="content">
             <form class="query-form" id="insuranceForm">
-                <div class="form-row">
-                    <div class="form-group">
+                <div class="form-row" style="grid-template-columns: 1fr 2fr;">
+                    <div class="form-group small">
                         <label for="insuranceCompany">投保公司</label>
                         <select id="insuranceCompany" required>
-                            <option value="">请选择投保公司</option>
+                            <option value="">请选择</option>
                             <option value="华海">华海</option>
                             <option value="燕赵">燕赵</option>
                             <option value="锦泰">锦泰</option>
