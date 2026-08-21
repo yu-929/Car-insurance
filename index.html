@@ -777,6 +777,23 @@
             }
         });
 
+        // 页面加载时设置初始默认值
+        (function() {
+            const companySelect = document.getElementById('insuranceCompany');
+            const citySelect = document.getElementById('city');
+            const vehicleTypeSelect = document.getElementById('vehicleType');
+            const businessTypeSelect = document.getElementById('businessType');
+
+            // 默认业务类型为转保
+            businessTypeSelect.value = '转保';
+
+            // 默认投保公司为华海，城市为商丘
+            companySelect.value = '华海';
+            applyOptionFilter(citySelect, huahaiExcludedCities);
+            applyOptionFilter(vehicleTypeSelect, huahaiExcludedVehicleTypes);
+            citySelect.value = '商丘';
+        })();
+
         // 城市变化时过滤车辆类型
         document.getElementById('city').addEventListener('change', function () {
             const company = document.getElementById('insuranceCompany').value;
