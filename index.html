@@ -336,8 +336,8 @@
                         <label for="vehicleType">车辆类型</label>
                         <select id="vehicleType" required>
                             <option value="">请选择</option>
-                            <option value="家自车">家自车</option>
-                            <option value="家自车【新能源】">家自车【新能源】</option>
+                            <option value="非营运客车">非营运客车</option>
+                            <option value="非营运客车【新能源】">非营运客车【新能源】</option>
                             <option value="营运货车">营运货车</option>
                             <option value="非营运货车">非营运货车</option>
                             <option value="特种车">特种车</option>
@@ -382,7 +382,7 @@
     <script>
         // 华海不支持的城市和车辆类型
         const huahaiExcludedCities = ['漯河', '信阳', '驻马店', '三门峡'];
-        const huahaiExcludedVehicleTypes = ['家自车【新能源】', '特种车'];
+        const huahaiExcludedVehicleTypes = ['非营运客车【新能源】', '特种车'];
         
         // 监听投保公司变化
         document.getElementById('insuranceCompany').addEventListener('change', function() {
@@ -457,7 +457,7 @@
             const rates = {
                 '华海': {
                     '郑州': {
-                        '家自车': {
+                        '非营运客车': {
                             '转保': {
                                 '单交': '8%',
                                 '单商': '18%',
