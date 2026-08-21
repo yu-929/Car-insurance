@@ -270,11 +270,6 @@
                     </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="queryDetails">查询详情</label>
-                    <textarea id="queryDetails" rows="4" placeholder="请描述您的具体需求或问题..."></textarea>
-                </div>
-                
                 <button type="submit" class="submit-btn">立即查询</button>
             </form>
             
@@ -317,7 +312,6 @@
             const city = document.getElementById('city').value;
             const insuranceType = document.getElementById('insuranceType').value;
             const vehicleType = document.getElementById('vehicleType').value;
-            const queryDetails = document.getElementById('queryDetails').value;
             
             // 模拟查询结果
             const resultContent = `
@@ -325,7 +319,6 @@
                 <p><strong>投保城市：</strong>${city}</p>
                 <p><strong>保险类型：</strong>${insuranceType}</p>
                 <p><strong>车辆类型：</strong>${vehicleType}</p>
-                <p><strong>查询详情：</strong>${queryDetails || '无'}</p>
                 <hr style="margin: 15px 0; border: 1px solid #eee;">
                 <p><strong>推荐方案：</strong>根据您在${city}通过${insuranceCompany}投保${vehicleType}的需求，我们推荐选择${insuranceType}方案。</p>
                 <p><strong>预估保费：</strong>约${calculatePremium(insuranceType)}元/年</p>
