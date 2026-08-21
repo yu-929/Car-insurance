@@ -380,6 +380,47 @@
     </div>
 
     <script>
+        // 华海不支持的城市和车辆类型
+        const huahaiExcludedCities = ['漯河', '信阳', '驻马店', '三门峡'];
+        const huahaiExcludedVehicleTypes = ['家自车【新能源】', '特种车'];
+        
+        // 监听投保公司变化
+        document.getElementById('insuranceCompany').addEventListener('change', function() {
+            const company = this.value;
+            const citySelect = document.getElementById('city');
+            const vehicleTypeSelect = document.getElementById('vehicleType');
+            
+            // 重置城市选项
+            const cityOptions = citySelect.options;
+            for (let i = 0; i < cityOptions.length; i++) {
+                if (cityOptions[i].value === '') continue;
+                if (company === '华海' && huahaiExcludedCities.includes(cityOptions[i].value)) {
+                    cityOptions[i].disabled = true;
+                    cityOptions[i].style.display = 'none';
+                } else {
+                    cityOptions[i].disabled = false;
+                    cityOptions[i].style.display = '';
+                }
+            }
+            
+            // 重置车辆类型选项
+            const vehicleTypeOptions = vehicleTypeSelect.options;
+            for (let i = 0; i < vehicleTypeOptions.length; i++) {
+                if (vehicleTypeOptions[i].value === '') continue;
+                if (company === '华海' && huahaiExcludedVehicleTypes.includes(vehicleTypeOptions[i].value)) {
+                    vehicleTypeOptions[i].disabled = true;
+                    vehicleTypeOptions[i].style.display = 'none';
+                } else {
+                    vehicleTypeOptions[i].disabled = false;
+                    vehicleTypeOptions[i].style.display = '';
+                }
+            }
+            
+            // 清空已选择的值
+            citySelect.value = '';
+            vehicleTypeSelect.value = '';
+        });
+        
         document.getElementById('insuranceForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
