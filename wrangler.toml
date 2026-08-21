@@ -5,7 +5,7 @@ compatibility_date = "2024-01-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "car-insurance-db"
-database_id = "your-database-id-here"  # 部署时替换为实际ID
+database_id = "ee330c17-bb87-40c7-965f-074131854fe8"
 
 # Pages Functions 目录
 [pages]
