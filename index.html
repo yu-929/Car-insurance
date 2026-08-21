@@ -248,6 +248,15 @@
                 
                 <div class="form-row">
                     <div class="form-group">
+                        <label for="businessType">业务类型</label>
+                        <select id="businessType" required>
+                            <option value="">请选择业务类型</option>
+                            <option value="转保">转保</option>
+                            <option value="续保">续保</option>
+                            <option value="新车">新车</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="insuranceType">保险类型</label>
                         <select id="insuranceType" required>
                             <option value="">请选择保险类型</option>
@@ -257,6 +266,9 @@
                             <option value="交商【不含损】">交商【不含损】</option>
                         </select>
                     </div>
+                </div>
+                
+                <div class="form-row">
                     <div class="form-group">
                         <label for="vehicleType">车辆类型</label>
                         <select id="vehicleType" required>
@@ -267,6 +279,9 @@
                             <option value="非营运货车">非营运货车</option>
                             <option value="特种车">特种车</option>
                         </select>
+                    </div>
+                    <div class="form-group">
+                        <!-- 占位，保持布局一致 -->
                     </div>
                 </div>
                 
@@ -310,19 +325,23 @@
             
             const insuranceCompany = document.getElementById('insuranceCompany').value;
             const city = document.getElementById('city').value;
+            const businessType = document.getElementById('businessType').value;
             const insuranceType = document.getElementById('insuranceType').value;
             const vehicleType = document.getElementById('vehicleType').value;
+            
+            // 查询费率
+            const rateInfo = getRateInfo(insuranceCompany, city, businessType, insuranceType, vehicleType);
             
             // 模拟查询结果
             const resultContent = `
                 <p><strong>投保公司：</strong>${insuranceCompany}</p>
                 <p><strong>投保城市：</strong>${city}</p>
+                <p><strong>业务类型：</strong>${businessType}</p>
                 <p><strong>保险类型：</strong>${insuranceType}</p>
                 <p><strong>车辆类型：</strong>${vehicleType}</p>
                 <hr style="margin: 15px 0; border: 1px solid #eee;">
-                <p><strong>推荐方案：</strong>根据您在${city}通过${insuranceCompany}投保${vehicleType}的需求，我们推荐选择${insuranceType}方案。</p>
-                <p><strong>预估保费：</strong>约${calculatePremium(insuranceType)}元/年</p>
-                <p><strong>备注：</strong>以上为参考价格，具体保费以保险公司实际核保为准。</p>
+                <p><strong>费率信息：</strong>${rateInfo.rate}</p>
+                ${rateInfo.note ? `<p><strong>备注：</strong>${rateInfo.note}</p>` : ''}
             `;
             
             document.getElementById('resultContent').innerHTML = resultContent;
@@ -332,31 +351,52 @@
             document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
         });
         
-        function getInsuranceTypeName(type) {
-            // 保险类型已经是中文，直接返回
-            return type;
-        }
-        
-        function calculatePremium(type) {
-            // 简单的保费计算模拟
-            let basePremium = 0;
-            switch(type) {
-                case '单交':
-                    basePremium = 950;
-                    break;
-                case '单商':
-                    basePremium = 1500;
-                    break;
-                case '交商【含损】':
-                    basePremium = 3500;
-                    break;
-                case '交商【不含损】':
-                    basePremium = 2800;
-                    break;
-                default:
-                    basePremium = 2000;
+        function getRateInfo(company, city, businessType, insuranceType, vehicleType) {
+            // 根据用户提供的费率数据
+            const rates = {
+                '华海': {
+                    '郑州': {
+                        '家自车': {
+                            '转保': {
+                                '单交': '8%',
+                                '单商': '18%',
+                                '交商【含损】': '18%+18%',
+                                '交商【不含损】': '18%'
+                            },
+                            '续保': {
+                                '单交': '11%',
+                                '单商': '21%',
+                                '交商【含损】': '21%+21%',
+                                '交商【不含损】': '21%'
+                            },
+                            '新车': {
+                                '单交': '禁保',
+                                '单商': '禁保',
+                                '交商【含损】': '18%+18%',
+                                '交商【不含损】': '18%'
+                            }
+                        }
+                    }
+                }
+            };
+            
+            // 非车险备注
+            let note = '';
+            if (vehicleType === '营运货车') {
+                note = '非车险费用：380元、580元、880元，费率20%';
+            } else if (city === '鹤壁') {
+                note = '非车险费用：30元';
+            } else {
+                note = '非车险费用：50元以下30元，50元以上45元';
             }
-            return basePremium.toLocaleString();
+            
+            // 获取费率
+            try {
+                const rate = rates[company][city][vehicleType][businessType][insuranceType];
+                return { rate: rate || '暂无数据', note: note };
+            } catch (e) {
+                return { rate: '暂无数据', note: note };
+            }
         }
     </script>
 </body>
