@@ -1,0 +1,32 @@
+{
+  "name": "car-insurance",
+  "version": "1.0.0",
+  "description": "车险政策查询系统",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "wrangler pages dev",
+    "deploy": "wrangler pages deploy",
+    "db:init": "wrangler d1 execute car-insurance-db --file=schema.sql",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yu-929/Car-insurance.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yu-929/Car-insurance/issues"
+  },
+  "homepage": "https://github.com/yu-929/Car-insurance#readme",
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
