@@ -619,6 +619,13 @@
                             <option value="是">是</option>
                         </select>
                     </div>
+                    <div class="field" id="isPremiumVehicleField" style="display:none;">
+                        <label for="isPremiumVehicle">是否优质车型</label>
+                        <select id="isPremiumVehicle">
+                            <option value="否">否</option>
+                            <option value="是">是</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="actions">
@@ -656,6 +663,7 @@
             const vehicleTypeSelect = document.getElementById('vehicleType');
             const hasCarAccidentField = document.getElementById('hasCarAccidentField');
             const hasPersonnelField = document.getElementById('hasPersonnelField');
+            const isPremiumVehicleField = document.getElementById('isPremiumVehicleField');
 
             if (company === '华海') {
                 applyOptionFilter(citySelect, huahaiExcludedCities);
@@ -677,6 +685,7 @@
                 vehicleTypeSelect.value = '';
                 hasCarAccidentField.style.display = 'block';
                 hasPersonnelField.style.display = 'none';
+                isPremiumVehicleField.style.display = 'none';
             } else {
                 applyOptionFilter(citySelect, []);
                 applyOptionFilter(vehicleTypeSelect, []);
@@ -684,20 +693,29 @@
                 vehicleTypeSelect.value = '';
                 hasCarAccidentField.style.display = 'none';
                 hasPersonnelField.style.display = 'none';
+                isPremiumVehicleField.style.display = 'none';
             }
         });
 
-        // 车辆类型变化时控制是否含人员字段
+        // 车辆类型变化时控制是否含人员和是否优质车型字段
         document.getElementById('vehicleType').addEventListener('change', function () {
             const company = document.getElementById('insuranceCompany').value;
             const vehicleType = this.value;
             const hasPersonnelField = document.getElementById('hasPersonnelField');
+            const isPremiumVehicleField = document.getElementById('isPremiumVehicleField');
 
             if (company === '锦泰' && vehicleType === '特种车') {
                 hasPersonnelField.style.display = 'block';
             } else {
                 hasPersonnelField.style.display = 'none';
                 document.getElementById('hasPersonnel').value = '否';
+            }
+
+            if (company === '锦泰' && vehicleType === '非营运客车【新能源】') {
+                isPremiumVehicleField.style.display = 'block';
+            } else {
+                isPremiumVehicleField.style.display = 'none';
+                document.getElementById('isPremiumVehicle').value = '否';
             }
         });
 
@@ -761,6 +779,7 @@
             const isTransfer = document.getElementById('isTransfer').value;
             const hasCarAccident = document.getElementById('hasCarAccident').value;
             const hasPersonnel = document.getElementById('hasPersonnel').value;
+            const isPremiumVehicle = document.getElementById('isPremiumVehicle').value;
 
             const rateInfo = getRateInfo(insuranceCompany, city, businessType, insuranceType, vehicleType, isTransfer);
 
@@ -797,6 +816,9 @@
                 items.push(['是否含车驾意', hasCarAccident]);
                 if (vehicleType === '特种车') {
                     items.push(['是否含人员', hasPersonnel]);
+                }
+                if (vehicleType === '非营运客车【新能源】') {
+                    items.push(['是否优质车型', isPremiumVehicle]);
                 }
             }
 
@@ -1641,6 +1663,13 @@
                                 '单商业': '12%',
                                 '交商共保': '2%+12%'
                             }
+                        },
+                        '非营运客车【新能源】': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '2%',
+                                '交商共保': '2%+2%'
+                            }
                         }
                     },
                     '开封': {
@@ -1649,6 +1678,13 @@
                                 '单交强': '禁保',
                                 '单商业': '12%',
                                 '交商共保': '2%+12%'
+                            }
+                        },
+                        '非营运客车【新能源】': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '2%',
+                                '交商共保': '2%+2%'
                             }
                         }
                     },
@@ -1659,6 +1695,13 @@
                                 '单商业': '12%',
                                 '交商共保': '2%+12%'
                             }
+                        },
+                        '非营运客车【新能源】': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '2%',
+                                '交商共保': '2%+2%'
+                            }
                         }
                     },
                     '平顶山': {
@@ -1667,6 +1710,13 @@
                                 '单交强': '禁保',
                                 '单商业': '12%',
                                 '交商共保': '2%+12%'
+                            }
+                        },
+                        '非营运客车【新能源】': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '2%',
+                                '交商共保': '2%+2%'
                             }
                         }
                     },
@@ -1677,6 +1727,13 @@
                                 '单商业': '12%',
                                 '交商共保': '2%+12%'
                             }
+                        },
+                        '非营运客车【新能源】': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '2%',
+                                '交商共保': '2%+2%'
+                            }
                         }
                     },
                     '鹤壁': {
@@ -1685,6 +1742,13 @@
                                 '单交强': '禁保',
                                 '单商业': '12%',
                                 '交商共保': '2%+12%'
+                            }
+                        },
+                        '非营运客车【新能源】': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '2%',
+                                '交商共保': '2%+2%'
                             }
                         }
                     },
@@ -1695,6 +1759,13 @@
                                 '单商业': '12%',
                                 '交商共保': '2%+12%'
                             }
+                        },
+                        '非营运客车【新能源】': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '2%',
+                                '交商共保': '2%+2%'
+                            }
                         }
                     },
                     '焦作': {
@@ -1703,6 +1774,13 @@
                                 '单交强': '禁保',
                                 '单商业': '12%',
                                 '交商共保': '2%+12%'
+                            }
+                        },
+                        '非营运客车【新能源】': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '2%',
+                                '交商共保': '2%+2%'
                             }
                         }
                     },
@@ -1713,6 +1791,13 @@
                                 '单商业': '12%',
                                 '交商共保': '2%+12%'
                             }
+                        },
+                        '非营运客车【新能源】': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '2%',
+                                '交商共保': '2%+2%'
+                            }
                         }
                     },
                     '商丘': {
@@ -1722,6 +1807,13 @@
                                 '单商业': '12%',
                                 '交商共保': '2%+12%'
                             }
+                        },
+                        '非营运客车【新能源】': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '2%',
+                                '交商共保': '2%+2%'
+                            }
                         }
                     },
                     '济源': {
@@ -1730,6 +1822,13 @@
                                 '单交强': '禁保',
                                 '单商业': '12%',
                                 '交商共保': '2%+12%'
+                            }
+                        },
+                        '非营运客车【新能源】': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '2%',
+                                '交商共保': '2%+2%'
                             }
                         }
                     }
@@ -1746,10 +1845,18 @@
                     note = '不含损搭售B区交通工具意外险基础款保费100元，费用35%；含损搭售B区交通工具意外险升级款保费200元，费用35%';
                 }
             } else if (company === '锦泰') {
-                if (hasCarAccident === '是') {
-                    note = '非车费用30%，200元车驾意商业16%';
+                if (vehicleType === '非营运客车【新能源】' && isPremiumVehicle === '否') {
+                    if (hasCarAccident === '是') {
+                        note = '非车费用30%，200元车驾意商业6%';
+                    } else {
+                        note = '非车费用30%';
+                    }
                 } else {
-                    note = '非车费用30%';
+                    if (hasCarAccident === '是') {
+                        note = '非车费用30%，200元车驾意商业16%';
+                    } else {
+                        note = '非车费用30%';
+                    }
                 }
             } else if (vehicleType === '营运货车') {
                 if (city === '洛阳') {
