@@ -221,35 +221,6 @@
             color: var(--color-text-secondary);
         }
 
-        .hero-companies {
-            margin-top: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .company-chip {
-            display: inline-flex;
-            align-items: baseline;
-            gap: 6px;
-            padding: 7px 16px;
-            border: 1px solid var(--color-border);
-            border-radius: 999px;
-            background: var(--color-bg-subtle);
-            font-size: 15px;
-            font-weight: 500;
-            line-height: 1.2;
-            color: var(--color-text);
-            white-space: nowrap;
-        }
-
-        .company-chip .chip-count {
-            font-size: 13px;
-            font-weight: 400;
-            color: var(--color-text-tertiary);
-        }
-
         .main {
             max-width: 780px;
             margin: 0 auto;
@@ -496,20 +467,6 @@
                 font-size: 17px;
             }
 
-            .hero-companies {
-                margin-top: 16px;
-                gap: 6px;
-            }
-
-            .company-chip {
-                padding: 6px 12px;
-                font-size: 14px;
-            }
-
-            .company-chip .chip-count {
-                font-size: 12px;
-            }
-
             .panel {
                 padding: 32px 24px;
                 border-radius: var(--radius-md);
@@ -543,7 +500,7 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-21 17:35</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-22 13:47</span>
         </div>
     </nav>
 
@@ -572,8 +529,7 @@
 
     <header class="hero">
         <h1>小钱车险政策查询</h1>
-        <p id="heroSubtitle">已收录费率的保险公司</p>
-        <div class="hero-companies" id="heroCompanies"></div>
+        <p id="heroSubtitle"></p>
     </header>
 
     <main class="main">
@@ -5134,36 +5090,17 @@
             }
         }
 
-        // 首页展示已收录费率的保险公司及其覆盖城市数
-        (function renderHeroCompanies() {
-            const container = document.getElementById('heroCompanies');
-            if (!container) return;
-            // 按投保公司下拉的既有顺序展示
-            const order = Array.from(document.querySelectorAll('#insuranceCompany option'))
+        // 副标题展示已收录费率的保险公司
+        (function renderHeroSubtitle() {
+            const subtitle = document.getElementById('heroSubtitle');
+            if (!subtitle) return;
+            // 按投保公司下拉的既有顺序，仅列出实际有费率数据的保司
+            const available = Array.from(document.querySelectorAll('#insuranceCompany option'))
                 .map(function (opt) { return opt.value; })
-                .filter(function (v) { return v; });
-            const available = order.filter(function (name) {
-                const cities = rates[name];
-                return cities && Object.keys(cities).length > 0;
-            });
-            if (!available.length) {
-                container.style.display = 'none';
-                return;
-            }
-            container.innerHTML = '';
-            available.forEach(function (name) {
-                const cityCount = Object.keys(rates[name]).length;
-                const chip = document.createElement('span');
-                chip.className = 'company-chip';
-                const label = document.createElement('span');
-                label.textContent = name;
-                const count = document.createElement('span');
-                count.className = 'chip-count';
-                count.textContent = cityCount + ' 个城市';
-                chip.appendChild(label);
-                chip.appendChild(count);
-                container.appendChild(chip);
-            });
+                .filter(function (name) {
+                    return name && rates[name] && Object.keys(rates[name]).length > 0;
+                });
+            subtitle.textContent = available.join('｜');
         })();
     </script>
 </body>
