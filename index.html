@@ -658,6 +658,7 @@
         const huahaiExcludedVehicleTypes = ['非营运客车【新能源】', '特种车'];
         const jintaiExcludedCities = ['周口', '南阳', '驻马店', '濮阳', '信阳', '三门峡'];
         const jintaiNewEnergyCities = ['洛阳', '平顶山', '安阳', '鹤壁', '焦作', '许昌', '济源', '郑州', '开封', '新乡', '漯河', '商丘'];
+        const jintaiOnlyVehicleTypes = ['1吨以下营运厢货', '1吨以上营运厢货'];
 
         // 上报费率弹窗
         const reportModal = document.getElementById('reportModal');
@@ -800,7 +801,7 @@
                 document.getElementById('businessTypeField').style.display = 'none';
             } else {
                 applyOptionFilter(citySelect, []);
-                applyOptionFilter(vehicleTypeSelect, []);
+                applyOptionFilter(vehicleTypeSelect, jintaiOnlyVehicleTypes);
                 citySelect.value = '';
                 vehicleTypeSelect.value = '';
                 hasCarAccidentField.style.display = 'none';
@@ -2875,22 +2876,24 @@
                     }
                 } else if (vehicleType === '非营运货车') {
                     if (hasCarAccident === '是') {
-                        note = '188元/228元车驾意商业18%';
+                        note = '非车费用30%，188元/228元车驾意商业18%';
                     } else {
-                        note = '';
+                        note = '非车费用30%';
                     }
                 } else if (vehicleType === '1吨以下营运厢货') {
                     if (hasCarAccident === '是') {
-                        note = '328元车驾意商业16%';
+                        note = '非车费用30%，328元车驾意商业16%';
                     } else {
-                        note = '';
+                        note = '非车费用30%';
                     }
                 } else if (vehicleType === '1吨以上营运厢货') {
                     if (hasCarAccident === '是') {
-                        note = '328元车驾意商业8%';
+                        note = '非车费用30%，328元车驾意商业8%';
                     } else {
-                        note = '';
+                        note = '非车费用30%';
                     }
+                } else if (vehicleType === '营运货车') {
+                    note = '非车费用30%';
                 } else {
                     if (hasCarAccident === '是') {
                         note = '非车费用30%，200元车驾意商业16%';
