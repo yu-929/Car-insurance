@@ -4922,19 +4922,23 @@
                     note += '；不含多用途货车/双排座货车';
                 }
                 if (vehicleType.indexOf('非营运货车') === 0 || vehicleType.indexOf('非营运厢货') === 0) {
-                    // 多用途/双排座货车禁保：许昌驻马店(非营运货车)、南阳(非营运厢货)
-                    // 商丘濮阳南阳：非营运货车 1吨以下 不承保多用途/双排座货车
-                    // 其余城市：多用途/双排座货车另有费率，以备注展示
-                    const duoYongTuBan = {
-                        '许昌': '非营运货车', '驻马店': '非营运货车', '南阳': '非营运厢货'
+                    // 多用途/双排座货车特殊承保规则，按城市 + 车型前缀匹配
+                    // 未命中的城市：非营运货车 1吨以下 另有费率或不予承保
+                    const duoYongTuSpecial = {
+                        '许昌': { match: '非营运货车', text: '多用途货车/双排座货车禁保' },
+                        '驻马店': { match: '非营运货车', text: '多用途货车/双排座货车禁保' },
+                        '南阳': { match: '非营运厢货', text: '多用途货车/双排座货车禁保' },
+                        '商丘': { match: '非营运货车 | 1吨以下', text: '多用途货车/双排座货车禁保' },
+                        '焦作': { match: '非营运货车 | 1吨以下', text: '多用途货车/双排座货车仅可承保单交，单商及交商禁保' }
                     };
                     const duoYongTuRates = {
                         '郑州': '3%/3%+11%', '新乡': '3%/3%+11%', '平顶山': '3%/3%+11%',
-                        '焦作': '3%/3%+11%', '开封': '3%/3%+11%', '三门峡': '3%/3%+11%',
+                        '开封': '3%/3%+11%', '三门峡': '3%/3%+11%',
                         '济源': '3%/3%+11%', '洛阳': '3%/3%+10%'
                     };
-                    if (duoYongTuBan[city] && vehicleType.indexOf(duoYongTuBan[city]) === 0) {
-                        note += '；多用途货车/双排座货车禁保';
+                    const special = duoYongTuSpecial[city];
+                    if (special && vehicleType.indexOf(special.match) === 0) {
+                        note += '；' + special.text;
                     } else if (vehicleType === '非营运货车 | 1吨以下') {
                         if (duoYongTuRates[city]) {
                             const parts = duoYongTuRates[city].split('/');
