@@ -831,7 +831,7 @@
                 document.getElementById('isTransferField').style.display = 'none';
                 document.getElementById('businessTypeField').style.display = 'none';
             } else if (company === '燕赵') {
-                const yanzhaoVehicles = allVehicleTypes.filter(v => v !== '校车' && !jintaiOnlyVehicleTypes.includes(v));
+                const yanzhaoVehicles = allVehicleTypes.filter(v => v !== '校车' && v !== '非营运客车 | 新能源' && !jintaiOnlyVehicleTypes.includes(v));
                 rebuildSelectOptions(citySelect, allCities);
                 rebuildSelectOptions(vehicleTypeSelect, yanzhaoVehicles);
                 // 强制重置为第一个选项（空值）
