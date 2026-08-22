@@ -868,6 +868,7 @@
             const hasPersonnelField = document.getElementById('hasPersonnelField');
             const isPremiumVehicleField = document.getElementById('isPremiumVehicleField');
             const citySelect = document.getElementById('city');
+            const underwritingConditionField = document.getElementById('underwritingConditionField');
 
             if (company === '锦泰' && vehicleType === '特种车') {
                 hasPersonnelField.style.display = 'block';
@@ -884,6 +885,16 @@
                 isPremiumVehicleField.style.display = 'none';
                 document.getElementById('isPremiumVehicle').value = '否';
                 applyOptionFilter(citySelect, jintaiExcludedCities);
+            }
+            
+            // 燕赵：只有非营运客车显示承保条件字段
+            if (company === '燕赵') {
+                if (vehicleType === '非营运客车') {
+                    underwritingConditionField.style.display = 'block';
+                } else {
+                    underwritingConditionField.style.display = 'none';
+                    document.getElementById('underwritingCondition').selectedIndex = 0;
+                }
             }
         });
 
@@ -3867,13 +3878,24 @@
                     if (vehicleType === '非营运企事业客车/救护车' && (city === '安阳' || city === '信阳')) {
                         return { rate: '禁保', note: note };
                     }
-                    // 获取费率
-                    let rateData = rates[company][city][vehicleType][underwritingCondition];
+                    // 获取费率数据
+                    let rateData;
+                    if (vehicleType === '非营运客车') {
+                        // 非营运客车使用承保条件维度
+                        rateData = rates[company][city][vehicleType][underwritingCondition];
+                    } else {
+                        // 其他车辆类型不使用承保条件维度，直接使用费率数据
+                        rateData = rates[company][city][vehicleType];
+                        if (rateData && rateData['常规车型']) {
+                            // 如果有常规车型维度，使用常规车型的数据
+                            rateData = rateData['常规车型'];
+                        }
+                    }
                     if (!rateData) {
                         return { rate: '暂无数据', note: note };
                     }
                     // 洛阳漯河商业-1
-                    if ((city === '洛阳' || city === '漯河') && specialVehicleTypes.includes(vehicleType)) {
+                    if ((city === '洛阳' || city === '漯河') && (specialVehicleTypes.includes(vehicleType) || vehicleType === '非营运企事业客车/救护车')) {
                         // 解析单商业费率
                         const commercialStr = rateData['单商业'];
                         const commercialNum = parseFloat(commercialStr);
