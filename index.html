@@ -834,8 +834,8 @@
                 const yanzhaoVehicles = allVehicleTypes.filter(v => v !== '校车' && !jintaiOnlyVehicleTypes.includes(v));
                 rebuildSelectOptions(citySelect, allCities);
                 rebuildSelectOptions(vehicleTypeSelect, yanzhaoVehicles);
-                citySelect.value = '郑州';
-                document.getElementById('businessType').value = '转保';
+                citySelect.value = '';
+                vehicleTypeSelect.value = '';
                 hasCarAccidentField.style.display = 'none';
                 hasPersonnelField.style.display = 'none';
                 isPremiumVehicleField.style.display = 'none';
