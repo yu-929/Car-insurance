@@ -653,7 +653,8 @@
         // 华海不支持的城市和车辆类型
         const huahaiExcludedCities = ['漯河', '信阳', '驻马店', '三门峡', '周口'];
         const huahaiExcludedVehicleTypes = ['非营运客车【新能源】', '特种车'];
-        const jintaiExcludedCities = ['周口', '南阳', '驻马店', '濮阳', '信阳', '三门峡', '郑州', '开封', '新乡', '漯河', '商丘'];
+        const jintaiExcludedCitiesBase = ['周口', '南阳', '驻马店', '濮阳', '信阳', '三门峡'];
+        const jintaiExcludedCitiesNewEnergy = ['周口', '南阳', '驻马店', '濮阳', '信阳', '三门峡', '郑州', '开封', '新乡', '漯河', '商丘'];
 
         // 上报费率弹窗
         const reportModal = document.getElementById('reportModal');
@@ -778,7 +779,7 @@
                 hasCarAccidentField.style.display = 'none';
                 hasPersonnelField.style.display = 'none';
             } else if (company === '锦泰') {
-                applyOptionFilter(citySelect, jintaiExcludedCities);
+                applyOptionFilter(citySelect, jintaiExcludedCitiesBase);
                 applyOptionFilter(vehicleTypeSelect, []);
                 citySelect.value = '';
                 vehicleTypeSelect.value = '';
@@ -802,6 +803,7 @@
             const vehicleType = this.value;
             const hasPersonnelField = document.getElementById('hasPersonnelField');
             const isPremiumVehicleField = document.getElementById('isPremiumVehicleField');
+            const citySelect = document.getElementById('city');
 
             if (company === '锦泰' && vehicleType === '特种车') {
                 hasPersonnelField.style.display = 'block';
@@ -812,9 +814,13 @@
 
             if (company === '锦泰' && vehicleType === '非营运客车【新能源】') {
                 isPremiumVehicleField.style.display = 'block';
-            } else {
+                // 更新城市排除列表
+                applyOptionFilter(citySelect, jintaiExcludedCitiesNewEnergy);
+            } else if (company === '锦泰') {
                 isPremiumVehicleField.style.display = 'none';
                 document.getElementById('isPremiumVehicle').value = '否';
+                // 恢复基础排除列表
+                applyOptionFilter(citySelect, jintaiExcludedCitiesBase);
             }
         });
 
