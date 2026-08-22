@@ -757,29 +757,6 @@
             });
         }
 
-        // 保险类型全集
-        const allInsuranceTypes = ['单交强', '单商业', '交商共保'];
-
-        // 保险类型选项联动
-        // 华海非营运客车新车业务单交强禁保，不提供该选项
-        function updateInsuranceTypeOptions() {
-            const company = document.getElementById('insuranceCompany').value;
-            const vehicleType = document.getElementById('vehicleType').value;
-            const businessType = document.getElementById('businessType').value;
-            const isTransfer = document.getElementById('isTransfer').value;
-            const insuranceTypeSelect = document.getElementById('insuranceType');
-
-            const hideDanJiaoQiang = company === '华海' && vehicleType === '非营运客车' &&
-                businessType === '新车' && isTransfer !== '是';
-            const available = hideDanJiaoQiang
-                ? allInsuranceTypes.filter(function (t) { return t !== '单交强'; })
-                : allInsuranceTypes;
-
-            const prev = insuranceTypeSelect.value;
-            rebuildSelectOptions(insuranceTypeSelect, available);
-            insuranceTypeSelect.value = available.indexOf(prev) !== -1 ? prev : '';
-        }
-
         // 上报费率弹窗
         const reportModal = document.getElementById('reportModal');
         const reportPassword = document.getElementById('reportPassword');
@@ -956,8 +933,6 @@
                 isPremiumVehicleField.style.display = 'none';
                 underwritingConditionField.style.display = 'none';
             }
-
-            updateInsuranceTypeOptions();
         });
 
         // 车辆类型变化时控制是否含人员和是否优质车型字段
@@ -991,8 +966,6 @@
                 document.getElementById('isTransferField').style.display = 'none';
                 updateYanzhaoUnderwriting();
             }
-
-            updateInsuranceTypeOptions();
         });
 
         // 燕赵承保条件字段的显隐与默认值
@@ -1036,7 +1009,6 @@
             rebuildSelectOptions(citySelect, huahaiCities);
             rebuildSelectOptions(vehicleTypeSelect, huahaiVehicles);
             citySelect.value = '商丘';
-            updateInsuranceTypeOptions();
         })();
 
         // 城市变化时过滤车辆类型
@@ -1070,12 +1042,6 @@
         // 燕赵：业务类型为新车时自动选择非常规车型
         document.getElementById('businessType').addEventListener('change', function () {
             updateYanzhaoUnderwriting();
-            updateInsuranceTypeOptions();
-        });
-
-        // 过户状态影响华海新车的保险类型可选项
-        document.getElementById('isTransfer').addEventListener('change', function () {
-            updateInsuranceTypeOptions();
         });
 
         function applyOptionFilter(selectEl, excluded, allowed) {
