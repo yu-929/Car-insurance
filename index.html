@@ -808,8 +808,9 @@
                 document.getElementById('businessTypeField').style.display = 'block';
             } else if (company === '锦泰') {
                 const jintaiCities = allCities.filter(c => !jintaiExcludedCities.includes(c));
+                const jintaiVehicles = allVehicleTypes.filter(v => v !== '校车');
                 rebuildSelectOptions(citySelect, jintaiCities);
-                rebuildSelectOptions(vehicleTypeSelect, allVehicleTypes);
+                rebuildSelectOptions(vehicleTypeSelect, jintaiVehicles);
                 citySelect.value = '';
                 vehicleTypeSelect.value = '';
                 hasCarAccidentField.style.display = 'block';
