@@ -728,7 +728,7 @@
     <script>
         // 华海不支持的城市和车辆类型
         const huahaiExcludedCities = ['漯河', '信阳', '驻马店', '三门峡', '周口'];
-        const huahaiExcludedVehicleTypes = ['非营运客车 | 新能源', '特种车'];
+        const huahaiExcludedVehicleTypes = ['特种车'];
         const jintaiExcludedCities = ['周口', '南阳', '驻马店', '濮阳', '信阳', '三门峡'];
         const jintaiNewEnergyCities = ['洛阳', '平顶山', '安阳', '鹤壁', '焦作', '许昌', '济源', '郑州', '开封', '新乡', '漯河', '商丘'];
         const jintaiOnlyVehicleTypes = ['营运厢货 | 1吨以下', '营运厢货 | 1吨以上'];
@@ -1033,8 +1033,7 @@
 
             if (company === '华海') {
                 // 华海：校车仅在安阳时显示
-                const baseExcluded = ['非营运客车 | 新能源', '特种车'];
-                const baseVehicles = allVehicleTypes.filter(v => !baseExcluded.includes(v) && !jintaiOnlyVehicleTypes.includes(v));
+                const baseVehicles = allVehicleTypes.filter(v => !huahaiExcludedVehicleTypes.includes(v) && !jintaiOnlyVehicleTypes.includes(v));
                 if (city === '安阳') {
                     rebuildSelectOptions(vehicleTypeSelect, baseVehicles);
                 } else {
@@ -1087,7 +1086,7 @@
             const isPremiumVehicle = document.getElementById('isPremiumVehicle').value;
             const underwritingCondition = document.getElementById('underwritingCondition').value;
 
-            const rateInfo = getRateInfo(insuranceCompany, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle);
+            const rateInfo = getRateInfo(insuranceCompany, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle, hasPersonnel);
 
             // 从数据库获取已审核通过的最新费率与备注，覆盖内置数据
             let displayRate = rateInfo.rate;
@@ -2077,8 +2076,7 @@
                             '单商业': '2%',
                             '交商共保': '2%+4%'
                         }
-                    }
-                },
+                    },
                     '特种车': {
                         '不含人员': {
                             '单交强': '6%',
@@ -2091,6 +2089,7 @@
                             '交商共保': '8%+18%'
                         }
                     },
+                },
                 '平顶山': {
                     '非营运客车': {
                         '不含车驾意': {
@@ -2177,8 +2176,7 @@
                             '单商业': '2%',
                             '交商共保': '2%+4%'
                         }
-                    }
-                },
+                    },
                     '特种车': {
                         '不含人员': {
                             '单交强': '6%',
@@ -2191,6 +2189,7 @@
                             '交商共保': '8%+18%'
                         }
                     },
+                },
                 '安阳': {
                     '非营运客车': {
                         '不含车驾意': {
@@ -2277,8 +2276,7 @@
                             '单商业': '2%',
                             '交商共保': '2%+4%'
                         }
-                    }
-                },
+                    },
                     '特种车': {
                         '不含人员': {
                             '单交强': '6%',
@@ -2291,6 +2289,7 @@
                             '交商共保': '8%+18%'
                         }
                     },
+                },
                 '鹤壁': {
                     '非营运客车': {
                         '不含车驾意': {
@@ -2377,8 +2376,7 @@
                             '单商业': '2%',
                             '交商共保': '2%+4%'
                         }
-                    }
-                },
+                    },
                     '特种车': {
                         '不含人员': {
                             '单交强': '6%',
@@ -2391,6 +2389,7 @@
                             '交商共保': '8%+18%'
                         }
                     },
+                },
                 '焦作': {
                     '非营运客车': {
                         '不含车驾意': {
@@ -2477,8 +2476,7 @@
                             '单商业': '2%',
                             '交商共保': '2%+4%'
                         }
-                    }
-                },
+                    },
                     '特种车': {
                         '不含人员': {
                             '单交强': '6%',
@@ -2491,6 +2489,7 @@
                             '交商共保': '8%+18%'
                         }
                     },
+                },
                 '许昌': {
                     '非营运客车': {
                         '不含车驾意': {
@@ -2577,8 +2576,7 @@
                             '单商业': '2%',
                             '交商共保': '2%+4%'
                         }
-                    }
-                },
+                    },
                     '特种车': {
                         '不含人员': {
                             '单交强': '6%',
@@ -2591,6 +2589,7 @@
                             '交商共保': '8%+18%'
                         }
                     },
+                },
                 '济源': {
                     '非营运客车': {
                         '不含车驾意': {
@@ -2677,8 +2676,7 @@
                             '单商业': '2%',
                             '交商共保': '2%+4%'
                         }
-                    }
-                },
+                    },
                     '特种车': {
                         '不含人员': {
                             '单交强': '6%',
@@ -2691,6 +2689,7 @@
                             '交商共保': '8%+18%'
                         }
                     },
+                },
                 '郑州': {
                     '非营运客车': {
                         '不含车驾意': {
@@ -2777,8 +2776,7 @@
                             '单商业': '2%',
                             '交商共保': '2%+4%'
                         }
-                    }
-                },
+                    },
                     '特种车': {
                         '不含人员': {
                             '单交强': '6%',
@@ -2791,6 +2789,7 @@
                             '交商共保': '8%+18%'
                         }
                     },
+                },
                 '开封': {
                     '非营运客车': {
                         '不含车驾意': {
@@ -2877,8 +2876,7 @@
                             '单商业': '2%',
                             '交商共保': '2%+4%'
                         }
-                    }
-                },
+                    },
                     '特种车': {
                         '不含人员': {
                             '单交强': '6%',
@@ -2891,6 +2889,7 @@
                             '交商共保': '8%+18%'
                         }
                     },
+                },
                 '新乡': {
                     '非营运客车': {
                         '不含车驾意': {
@@ -2977,8 +2976,7 @@
                             '单商业': '2%',
                             '交商共保': '2%+4%'
                         }
-                    }
-                },
+                    },
                     '特种车': {
                         '不含人员': {
                             '单交强': '6%',
@@ -2991,6 +2989,7 @@
                             '交商共保': '8%+18%'
                         }
                     },
+                },
                 '漯河': {
                     '非营运客车': {
                         '不含车驾意': {
@@ -3077,8 +3076,7 @@
                             '单商业': '2%',
                             '交商共保': '2%+4%'
                         }
-                    }
-                },
+                    },
                     '特种车': {
                         '不含人员': {
                             '单交强': '6%',
@@ -3091,6 +3089,7 @@
                             '交商共保': '8%+18%'
                         }
                     },
+                },
                 '商丘': {
                     '非营运客车': {
                         '不含车驾意': {
@@ -3177,20 +3176,20 @@
                             '单商业': '2%',
                             '交商共保': '2%+4%'
                         }
-                    }
-                },
+                    },
                     '特种车': {
                         '不含人员': {
                             '单交强': '6%',
                             '单商业': '6%',
                             '交商共保': '6%+16%'
                         },
-                            '含人员': {
+                        '含人员': {
                             '单交强': '8%',
                             '单商业': '8%',
                             '交商共保': '8%+18%'
                         }
                     }
+                },
             },
                                                 '燕赵': {
                 '郑州': {
@@ -4953,7 +4952,7 @@
             }
         };
 
-        function getRateInfo(company, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle) {
+        function getRateInfo(company, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle, hasPersonnel) {
 
             let note = '';
             if (company === '国任') {
