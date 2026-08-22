@@ -4356,23 +4356,6 @@
                     if (!rateData) {
                         return { rate: '暂无数据', note: note };
                     }
-                    // 洛阳漯河商业-1
-                    if ((city === '洛阳' || city === '漯河') && (specialVehicleTypes.includes(vehicleType) || vehicleType === '非营运企事业客车/救护车')) {
-                        // 解析单商业费率
-                        const commercialStr = rateData['单商业'];
-                        const commercialNum = parseFloat(commercialStr);
-                        const newCommercial = (commercialNum - 1) + '%';
-                        // 解析交商共保费率
-                        const comboStr = rateData['交商共保'];
-                        const comboParts = comboStr.split('+');
-                        const comboCommercialNum = parseFloat(comboParts[0]);
-                        const newComboCommercial = (comboCommercialNum - 1) + '%';
-                        const newCombo = newComboCommercial + '+' + comboParts[1];
-                        return { 
-                            rate: rateData['单交强'] + '/' + newCommercial + '/' + newCombo, 
-                            note: note 
-                        };
-                    }
                     const rate = rateData[insuranceType];
                     return { rate: rate || '暂无数据', note: note };
                 }
