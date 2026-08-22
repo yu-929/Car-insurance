@@ -4329,7 +4329,7 @@
                     const underwritingCondition = document.getElementById('underwritingCondition').value;
                     // 特种车禁保城市
                     const specialVehicleTypes = ['特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车'];
-                    if (specialVehicleTypes.includes(vehicleType) && (city === '安阳' || city === '信阳')) {
+                    if (specialVehicleTypes.includes(vehicleType) && (city === '安阳' || city === '信阳' || city === '周口')) {
                         return { rate: '禁保', note: note };
                     }
                     // 非营运企事业客车/救护车禁保城市
