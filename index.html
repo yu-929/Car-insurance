@@ -890,7 +890,8 @@
             // 燕赵：所有车辆类型都不显示是否过户字段
             if (company === '燕赵') {
                 document.getElementById('isTransferField').style.display = 'none';
-                if (vehicleType === '非营运客车') {
+                const yanzhaoCitiesWithUnderwriting = ['郑州', '焦作', '商丘', '许昌', '平顶山', '漯河', '新乡'];
+                if (vehicleType === '非营运客车' && yanzhaoCitiesWithUnderwriting.includes(city)) {
                     underwritingConditionField.style.display = 'block';
                 } else {
                     underwritingConditionField.style.display = 'none';
@@ -922,6 +923,7 @@
         document.getElementById('city').addEventListener('change', function () {
             const company = document.getElementById('insuranceCompany').value;
             const city = this.value;
+            const vehicleType = document.getElementById('vehicleType').value;
             const vehicleTypeSelect = document.getElementById('vehicleType');
 
             if (company === '华海') {
@@ -932,6 +934,17 @@
                     rebuildSelectOptions(vehicleTypeSelect, baseVehicles);
                 } else {
                     rebuildSelectOptions(vehicleTypeSelect, baseVehicles.filter(v => v !== '校车'));
+                }
+            }
+            // 燕赵：城市变化时控制承保条件字段
+            if (company === '燕赵' && vehicleType === '非营运客车') {
+                const underwritingConditionField = document.getElementById('underwritingConditionField');
+                const yanzhaoCitiesWithUnderwriting = ['郑州', '焦作', '商丘', '许昌', '平顶山', '漯河', '新乡'];
+                if (yanzhaoCitiesWithUnderwriting.includes(city)) {
+                    underwritingConditionField.style.display = 'block';
+                } else {
+                    underwritingConditionField.style.display = 'none';
+                    document.getElementById('underwritingCondition').selectedIndex = 0;
                 }
             }
         });
@@ -3147,11 +3160,6 @@
                                 '单交强': '禁保',
                                 '单商业': '2%',
                                 '交商共保': '2%+14%'
-                            },
-                            '非常规车型': {
-                                '单交强': '禁保',
-                                '单商业': '2%',
-                                '交商共保': '2%+14%'
                             }
                         },
                         '非营运企事业客车/救护车': {
@@ -3230,11 +3238,6 @@
                     '洛阳': {
                         '非营运客车': {
                             '常规车型': {
-                                '单交强': '禁保',
-                                '单商业': '2%',
-                                '交商共保': '2%+13%'
-                            },
-                            '非常规车型': {
                                 '单交强': '禁保',
                                 '单商业': '2%',
                                 '交商共保': '2%+13%'
@@ -3813,11 +3816,6 @@
                                 '单交强': '禁保',
                                 '单商业': '2%',
                                 '交商共保': '2%+14%'
-                            },
-                            '非常规车型': {
-                                '单交强': '禁保',
-                                '单商业': '2%',
-                                '交商共保': '2%+14%'
                             }
                         },
                         '非营运企事业客车/救护车': {
@@ -3985,11 +3983,6 @@
                                 '单交强': '禁保',
                                 '单商业': '2%',
                                 '交商共保': '2%+14%'
-                            },
-                            '非常规车型': {
-                                '单交强': '禁保',
-                                '单商业': '2%',
-                                '交商共保': '2%+14%'
                             }
                         },
                         '非营运企事业客车/救护车': {
@@ -4142,11 +4135,6 @@
                     '驻马店': {
                         '非营运客车': {
                             '常规车型': {
-                                '单交强': '禁保',
-                                '单商业': '2%',
-                                '交商共保': '2%+14%'
-                            },
-                            '非常规车型': {
                                 '单交强': '禁保',
                                 '单商业': '2%',
                                 '交商共保': '2%+14%'
@@ -4350,9 +4338,13 @@
                     }
                     // 获取费率数据
                     let rateData;
-                    if (vehicleType === '非营运客车') {
-                        // 非营运客车使用承保条件维度
+                    const yanzhaoCitiesWithUnderwriting = ['郑州', '焦作', '商丘', '许昌', '平顶山', '漯河', '新乡'];
+                    if (vehicleType === '非营运客车' && yanzhaoCitiesWithUnderwriting.includes(city)) {
+                        // 非营运客车在支持非常规车型的城市使用承保条件维度
                         rateData = rates[company][city][vehicleType][underwritingCondition];
+                    } else if (vehicleType === '非营运客车') {
+                        // 非营运客车在不支持非常规车型的城市使用常规车型
+                        rateData = rates[company][city][vehicleType]['常规车型'];
                     } else {
                         // 其他车辆类型不使用承保条件维度，直接使用费率数据
                         rateData = rates[company][city][vehicleType];
