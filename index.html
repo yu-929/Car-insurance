@@ -642,6 +642,7 @@
                 <div class="rate" id="resultRate"></div>
             </div>
             <p class="result-note" id="resultNote"></p>
+            <p class="result-note" id="premiumNote" style="display:none; margin-top:8px; color:#666; font-size:0.9em;"></p>
         </section>
     </main>
 
@@ -771,6 +772,9 @@
                 citySelect.value = '商丘';
                 hasCarAccidentField.style.display = 'none';
                 hasPersonnelField.style.display = 'none';
+                isPremiumVehicleField.style.display = 'none';
+                document.getElementById('isTransferField').style.display = 'block';
+                document.getElementById('businessTypeField').style.display = 'block';
             } else if (company === '国任') {
                 applyOptionFilter(citySelect, [], guorenCities);
                 applyOptionFilter(vehicleTypeSelect, [], guorenVehicleTypes);
@@ -778,6 +782,9 @@
                 vehicleTypeSelect.value = '非营运客车';
                 hasCarAccidentField.style.display = 'none';
                 hasPersonnelField.style.display = 'none';
+                isPremiumVehicleField.style.display = 'none';
+                document.getElementById('isTransferField').style.display = 'block';
+                document.getElementById('businessTypeField').style.display = 'block';
             } else if (company === '锦泰') {
                 applyOptionFilter(citySelect, jintaiExcludedCities);
                 applyOptionFilter(vehicleTypeSelect, []);
@@ -941,6 +948,15 @@
 
             document.getElementById('resultRate').textContent = rateInfo.rate;
             document.getElementById('resultNote').textContent = displayNote ? '备注信息：' + displayNote : '';
+
+            // 锦泰优质车型额外备注
+            const premiumNote = document.getElementById('premiumNote');
+            if (insuranceCompany === '锦泰' && vehicleType === '非营运客车【新能源】' && isPremiumVehicle === '是') {
+                premiumNote.textContent = '优质车型：五菱宏光MINI EV、五菱缤果、五菱缤果S、奇瑞eQ1、奇瑞QQ冰淇淋、长安Lumin、长安奔奔E-Star、吉利熊猫mini、吉利星愿、比亚迪海鸥、一汽奔腾小马、零跑T03';
+                premiumNote.style.display = 'block';
+            } else {
+                premiumNote.style.display = 'none';
+            }
 
             const resultSection = document.getElementById('resultSection');
             resultSection.style.display = 'block';
