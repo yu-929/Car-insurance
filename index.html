@@ -820,12 +820,11 @@
 
             if (company === '锦泰' && vehicleType === '非营运客车【新能源】') {
                 isPremiumVehicleField.style.display = 'block';
-                // 新能源只支持特定城市
+                // 新能源只在这几个城市有费率数据
                 applyOptionFilter(citySelect, [], jintaiNewEnergyCities);
             } else if (company === '锦泰') {
                 isPremiumVehicleField.style.display = 'none';
                 document.getElementById('isPremiumVehicle').value = '否';
-                // 恢复排除列表
                 applyOptionFilter(citySelect, jintaiExcludedCities);
             }
         });
