@@ -919,7 +919,7 @@
                 // 获取失败时使用默认备注
             }
 
-            const items = [
+            let items = [
                 ['投保公司', insuranceCompany],
                 ['投保城市', city],
                 ['业务类型', businessType],
@@ -928,8 +928,11 @@
                 ['是否过户', isTransfer]
             ];
 
-            // 锦泰显示额外条件
+            // 锦泰不显示业务类型和是否过户
             if (insuranceCompany === '锦泰') {
+                items = items.filter(function(item) {
+                    return item[0] !== '业务类型' && item[0] !== '是否过户';
+                });
                 items.push(['是否含车驾意', hasCarAccident]);
                 if (vehicleType === '特种车') {
                     items.push(['是否含人员', hasPersonnel]);
