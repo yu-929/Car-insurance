@@ -430,6 +430,11 @@
             letter-spacing: -0.224px;
         }
 
+        .result-note .note-label {
+            color: var(--color-text-secondary);
+            font-weight: 400;
+        }
+
         .footer {
             border-top: 1px solid var(--color-border);
             padding: 28px 22px;
@@ -723,9 +728,8 @@
             const currentRate = this.textContent;
             if (currentRate && currentRate !== '暂无数据') {
                 newRateInput.value = currentRate;
-                // 获取当前备注并填入
-                const currentNote = document.getElementById('resultNote').textContent;
-                reportNote.value = currentNote ? currentNote.replace('备注信息：', '') : '';
+                // 获取当前备注并填入（取纯备注内容，不含标签）
+                reportNote.value = document.getElementById('resultNote').dataset.note || '';
                 reportModal.classList.add('active');
             }
         });
@@ -1078,7 +1082,15 @@
                 .join('');
 
             document.getElementById('resultRate').textContent = rateInfo.rate;
-            document.getElementById('resultNote').textContent = displayNote ? '备注信息：' + displayNote : '';
+            const resultNote = document.getElementById('resultNote');
+            resultNote.dataset.note = displayNote || '';
+            if (displayNote) {
+                resultNote.innerHTML = '<span class="note-label">备注信息：</span>' +
+                    '<span class="note-body"></span>';
+                resultNote.querySelector('.note-body').textContent = displayNote;
+            } else {
+                resultNote.textContent = '';
+            }
 
             // 锦泰优质车型额外备注
             const premiumNote = document.getElementById('premiumNote');
