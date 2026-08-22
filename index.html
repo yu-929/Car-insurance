@@ -30,6 +30,9 @@
             --color-primary-focus: #0071e3;
             --color-primary-on-dark: #2997ff;
 
+            /* 提示 · 备注强调色 */
+            --color-note: #d70015;
+
             /* 字体 · 规格：Display 与 Text 双栈 */
             --font-display: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display',
                 'PingFang SC', 'Microsoft YaHei', sans-serif;
@@ -422,7 +425,8 @@
             margin-top: 16px;
             font-size: 14px;
             line-height: 1.43;
-            color: var(--color-text-secondary);
+            color: var(--color-note);
+            font-weight: 700;
             letter-spacing: -0.224px;
         }
 
@@ -651,7 +655,7 @@
                 <div class="rate" id="resultRate"></div>
             </div>
             <p class="result-note" id="resultNote"></p>
-            <p class="result-note" id="premiumNote" style="display:none; margin-top:8px; color:#666; font-size:0.9em;"></p>
+            <p class="result-note" id="premiumNote" style="display:none; margin-top:8px; font-size:0.9em;"></p>
         </section>
     </main>
 
