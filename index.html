@@ -628,6 +628,13 @@
                             <option value="是">是</option>
                         </select>
                     </div>
+                    <div class="field" id="underwritingConditionField" style="display:none;">
+                        <label for="underwritingCondition">承保条件</label>
+                        <select id="underwritingCondition">
+                            <option value="常规车型">常规车型</option>
+                            <option value="非常规车型">非常规车型（多用途旅行车｜过户车｜新车）</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="actions">
@@ -783,6 +790,7 @@
             const hasCarAccidentField = document.getElementById('hasCarAccidentField');
             const hasPersonnelField = document.getElementById('hasPersonnelField');
             const isPremiumVehicleField = document.getElementById('isPremiumVehicleField');
+            const underwritingConditionField = document.getElementById('underwritingConditionField');
 
             if (company === '华海') {
                 const huahaiCities = allCities.filter(c => !huahaiExcludedCities.includes(c));
@@ -793,6 +801,7 @@
                 hasCarAccidentField.style.display = 'none';
                 hasPersonnelField.style.display = 'none';
                 isPremiumVehicleField.style.display = 'none';
+                underwritingConditionField.style.display = 'none';
                 document.getElementById('isTransferField').style.display = 'block';
                 document.getElementById('businessTypeField').style.display = 'block';
             } else if (company === '国任') {
@@ -804,6 +813,7 @@
                 hasCarAccidentField.style.display = 'none';
                 hasPersonnelField.style.display = 'none';
                 isPremiumVehicleField.style.display = 'none';
+                underwritingConditionField.style.display = 'none';
                 document.getElementById('isTransferField').style.display = 'block';
                 document.getElementById('businessTypeField').style.display = 'block';
             } else if (company === '锦泰') {
@@ -816,9 +826,21 @@
                 hasCarAccidentField.style.display = 'block';
                 hasPersonnelField.style.display = 'none';
                 isPremiumVehicleField.style.display = 'none';
+                underwritingConditionField.style.display = 'none';
                 // 锦泰不区分过户和业务类型，隐藏这两个字段
                 document.getElementById('isTransferField').style.display = 'none';
                 document.getElementById('businessTypeField').style.display = 'none';
+            } else if (company === '燕赵') {
+                const yanzhaoVehicles = allVehicleTypes.filter(v => v !== '校车' && !jintaiOnlyVehicleTypes.includes(v));
+                rebuildSelectOptions(citySelect, allCities);
+                rebuildSelectOptions(vehicleTypeSelect, yanzhaoVehicles);
+                citySelect.value = '郑州';
+                hasCarAccidentField.style.display = 'none';
+                hasPersonnelField.style.display = 'none';
+                isPremiumVehicleField.style.display = 'none';
+                underwritingConditionField.style.display = 'block';
+                document.getElementById('isTransferField').style.display = 'block';
+                document.getElementById('businessTypeField').style.display = 'block';
             } else {
                 const otherVehicles = allVehicleTypes.filter(v => !jintaiOnlyVehicleTypes.includes(v));
                 rebuildSelectOptions(citySelect, allCities);
@@ -831,6 +853,7 @@
                 document.getElementById('isTransferField').style.display = 'block';
                 document.getElementById('businessTypeField').style.display = 'block';
                 isPremiumVehicleField.style.display = 'none';
+                underwritingConditionField.style.display = 'none';
             }
         });
 
@@ -925,6 +948,7 @@
             const hasCarAccident = document.getElementById('hasCarAccident').value;
             const hasPersonnel = document.getElementById('hasPersonnel').value;
             const isPremiumVehicle = document.getElementById('isPremiumVehicle').value;
+            const underwritingCondition = document.getElementById('underwritingCondition').value;
 
             const rateInfo = getRateInfo(insuranceCompany, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle);
 
@@ -2863,14 +2887,29 @@
                                 '单商业': '6%',
                                 '交商共保': '6%+16%'
                             },
-                            '含人员': {
+                                '含人员': {
                                 '单交强': '8%',
                                 '单商业': '8%',
                                 '交商共保': '8%+18%'
                             }
                         }
+                },
+                '燕赵': {
+                    '郑州': {
+                        '非营运客车': {
+                            '常规车型': {
+                                '单交强': '7%',
+                                '单商业': '19%',
+                                '交商共保': '双19%'
+                            },
+                            '非常规车型': {
+                                '单交强': '5%',
+                                '单商业': '17%',
+                                '交商共保': '双17%'
+                            }
+                        }
+                    }
                 }
-
 
 
             };
@@ -2926,6 +2965,8 @@
                         note = '非车费用30%';
                     }
                 }
+            } else if (company === '燕赵') {
+                note = '驾乘费用40%，家财费用30%，180元（含）以上驾乘35%';
             } else if (vehicleType === '营运货车') {
                 if (city === '洛阳') {
                     note = '无返回以外情况及1-5档交商共保交强-5；非车险费用：380元、580元、880元，费率20%；50元以下30%，50元以上45%';
@@ -2972,6 +3013,12 @@
                         return { rate: rate || '暂无数据', note: note };
                     }
                     const rate = rates[company][city][vehicleType][carAccidentKey][insuranceType];
+                    return { rate: rate || '暂无数据', note: note };
+                }
+                // 燕赵使用承保条件维度
+                if (company === '燕赵') {
+                    const underwritingCondition = document.getElementById('underwritingCondition').value;
+                    const rate = rates[company][city][vehicleType][underwritingCondition][insuranceType];
                     return { rate: rate || '暂无数据', note: note };
                 }
                 const rate = rates[company][city][vehicleType][effectiveType][insuranceType];
