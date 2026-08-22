@@ -891,7 +891,7 @@
             const hasPersonnel = document.getElementById('hasPersonnel').value;
             const isPremiumVehicle = document.getElementById('isPremiumVehicle').value;
 
-            const rateInfo = getRateInfo(insuranceCompany, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident);
+            const rateInfo = getRateInfo(insuranceCompany, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle);
 
             // 从数据库获取最新备注
             let displayNote = rateInfo.note;
@@ -947,7 +947,7 @@
             resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         });
 
-        function getRateInfo(company, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident) {
+        function getRateInfo(company, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle) {
             const rates = {
                 '华海': {
                     '郑州': {
