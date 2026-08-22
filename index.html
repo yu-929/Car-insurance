@@ -858,8 +858,8 @@
                 // 强制重置为第一个选项（空值）
                 citySelect.selectedIndex = 0;
                 vehicleTypeSelect.selectedIndex = 0;
-                // 重置业务类型为第一个选项
-                document.getElementById('businessType').selectedIndex = 0;
+                // 默认业务类型为转保
+                document.getElementById('businessType').value = '转保';
                 hasCarAccidentField.style.display = 'none';
                 hasPersonnelField.style.display = 'none';
                 isPremiumVehicleField.style.display = 'none';
