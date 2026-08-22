@@ -450,6 +450,18 @@
             color: var(--color-text-tertiary);
         }
 
+        .rate-updated-tag {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 500;
+            line-height: 1.5;
+            color: var(--color-primary);
+            background: rgba(0, 102, 204, 0.1);
+            border-radius: 4px;
+        }
+
         .result-note {
             margin-top: 16px;
             font-size: 14px;
@@ -702,6 +714,7 @@
             <div class="result-highlight">
                 <span class="key">费率信息</span>
                 <div class="rate" id="resultRate"></div>
+                <span class="rate-updated-tag" id="rateUpdatedTag" style="display:none;">已更新</span>
             </div>
             <p class="result-note" id="resultNote"></p>
             <p class="result-note" id="premiumNote" style="display:none; margin-top:8px; font-size:0.9em;"></p>
@@ -1076,8 +1089,10 @@
 
             const rateInfo = getRateInfo(insuranceCompany, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle);
 
-            // 从数据库获取最新备注
+            // 从数据库获取已审核通过的最新费率与备注，覆盖内置数据
+            let displayRate = rateInfo.rate;
             let displayNote = rateInfo.note;
+            let isOverridden = false;
             try {
                 const params = new URLSearchParams({
                     company: insuranceCompany,
@@ -1088,11 +1103,16 @@
                 });
                 const response = await fetch('/api/latest-note?' + params.toString());
                 const data = await response.json();
+                if (data.new_rate) {
+                    displayRate = data.new_rate;
+                    isOverridden = true;
+                }
                 if (data.note) {
                     displayNote = data.note;
+                    isOverridden = true;
                 }
             } catch (error) {
-                // 获取失败时使用默认备注
+                // 获取失败时使用内置费率与备注
             }
 
             let items = [
@@ -1125,7 +1145,9 @@
                 })
                 .join('');
 
-            document.getElementById('resultRate').textContent = rateInfo.rate;
+            document.getElementById('resultRate').textContent = displayRate;
+            const updatedTag = document.getElementById('rateUpdatedTag');
+            updatedTag.style.display = isOverridden ? 'inline-block' : 'none';
             const resultNote = document.getElementById('resultNote');
             resultNote.dataset.note = displayNote || '';
             if (displayNote) {
