@@ -842,8 +842,9 @@
                 hasCarAccidentField.style.display = 'none';
                 hasPersonnelField.style.display = 'none';
                 isPremiumVehicleField.style.display = 'none';
-                underwritingConditionField.style.display = 'block';
-                document.getElementById('isTransferField').style.display = 'block';
+                underwritingConditionField.style.display = 'none';
+                document.getElementById('underwritingCondition').selectedIndex = 0;
+                document.getElementById('isTransferField').style.display = 'none';
                 document.getElementById('businessTypeField').style.display = 'block';
             } else {
                 const otherVehicles = allVehicleTypes.filter(v => !jintaiOnlyVehicleTypes.includes(v));
@@ -890,15 +891,33 @@
             // 燕赵：所有车辆类型都不显示是否过户字段
             if (company === '燕赵') {
                 document.getElementById('isTransferField').style.display = 'none';
-                const yanzhaoCitiesWithUnderwriting = ['郑州', '焦作', '商丘', '许昌', '平顶山', '漯河', '新乡'];
-                if (vehicleType === '非营运客车' && yanzhaoCitiesWithUnderwriting.includes(city)) {
-                    underwritingConditionField.style.display = 'block';
-                } else {
-                    underwritingConditionField.style.display = 'none';
-                    document.getElementById('underwritingCondition').selectedIndex = 0;
-                }
+                updateYanzhaoUnderwriting();
             }
         });
+
+        // 燕赵承保条件字段的显隐与默认值
+        // 仅 非营运客车 且城市在允许列表内时显示；业务类型为新车时自动选非常规车型
+        function updateYanzhaoUnderwriting() {
+            const company = document.getElementById('insuranceCompany').value;
+            const underwritingConditionField = document.getElementById('underwritingConditionField');
+            const underwritingCondition = document.getElementById('underwritingCondition');
+
+            if (company !== '燕赵') return;
+
+            const city = document.getElementById('city').value;
+            const vehicleType = document.getElementById('vehicleType').value;
+            const businessType = document.getElementById('businessType').value;
+            const yanzhaoCitiesWithUnderwriting = ['郑州', '焦作', '商丘', '许昌', '平顶山', '漯河', '新乡'];
+            const shouldShow = vehicleType === '非营运客车' && yanzhaoCitiesWithUnderwriting.includes(city);
+
+            if (shouldShow) {
+                underwritingConditionField.style.display = 'block';
+                underwritingCondition.value = businessType === '新车' ? '非常规车型' : '常规车型';
+            } else {
+                underwritingConditionField.style.display = 'none';
+                underwritingCondition.selectedIndex = 0;
+            }
+        }
 
         // 页面加载时设置初始默认值
         (function() {
@@ -937,34 +956,12 @@
                 }
             }
             // 燕赵：城市变化时控制承保条件字段
-            if (company === '燕赵' && vehicleType === '非营运客车') {
-                const underwritingConditionField = document.getElementById('underwritingConditionField');
-                const yanzhaoCitiesWithUnderwriting = ['郑州', '焦作', '商丘', '许昌', '平顶山', '漯河', '新乡'];
-                if (yanzhaoCitiesWithUnderwriting.includes(city)) {
-                    underwritingConditionField.style.display = 'block';
-                } else {
-                    underwritingConditionField.style.display = 'none';
-                    document.getElementById('underwritingCondition').selectedIndex = 0;
-                }
-            }
+            updateYanzhaoUnderwriting();
         });
 
         // 燕赵：业务类型为新车时自动选择非常规车型
         document.getElementById('businessType').addEventListener('change', function () {
-            const company = document.getElementById('insuranceCompany').value;
-            const businessType = this.value;
-            const vehicleType = document.getElementById('vehicleType').value;
-            const underwritingConditionField = document.getElementById('underwritingConditionField');
-            const yanzhaoCitiesWithUnderwriting = ['郑州', '焦作', '商丘', '许昌', '平顶山', '漯河', '新乡'];
-            const city = document.getElementById('city').value;
-
-            if (company === '燕赵' && vehicleType === '非营运客车' && yanzhaoCitiesWithUnderwriting.includes(city)) {
-                if (businessType === '新车') {
-                    document.getElementById('underwritingCondition').value = '非常规车型';
-                } else {
-                    document.getElementById('underwritingCondition').selectedIndex = 0;
-                }
-            }
+            updateYanzhaoUnderwriting();
         });
 
         function applyOptionFilter(selectEl, excluded, allowed) {
