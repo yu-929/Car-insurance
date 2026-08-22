@@ -3874,12 +3874,18 @@
                     }
                     // 洛阳漯河商业-1
                     if ((city === '洛阳' || city === '漯河') && specialVehicleTypes.includes(vehicleType)) {
-                        const commercialRate = parseInt(rateData['单商业']);
-                        const comboRate = rateData['交商共保'];
-                        const comboParts = comboRate.split('+');
-                        const newComboCommercial = (parseInt(comboParts[0]) - 1) + '%';
+                        // 解析单商业费率
+                        const commercialStr = rateData['单商业'];
+                        const commercialNum = parseFloat(commercialStr);
+                        const newCommercial = (commercialNum - 1) + '%';
+                        // 解析交商共保费率
+                        const comboStr = rateData['交商共保'];
+                        const comboParts = comboStr.split('+');
+                        const comboCommercialNum = parseFloat(comboParts[0]);
+                        const newComboCommercial = (comboCommercialNum - 1) + '%';
+                        const newCombo = newComboCommercial + '+' + comboParts[1];
                         return { 
-                            rate: rateData['单交强'] + '/' + (commercialRate - 1) + '%/' + newComboCommercial + '+' + comboParts[1], 
+                            rate: rateData['单交强'] + '/' + newCommercial + '/' + newCombo, 
                             note: note 
                         };
                     }
