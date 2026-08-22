@@ -4909,19 +4909,24 @@
                 if (vehicleType === '营运厢货 | 1吨以下') {
                     note += '；不含多用途货车/双排座货车';
                 }
-                if (vehicleType === '非营运货车 | 1吨以下') {
-                    // 商丘许昌濮阳驻马店南阳：不承保多用途/双排座货车
+                if (vehicleType.indexOf('非营运货车') === 0) {
+                    // 许昌驻马店：多用途/双排座货车禁保（适用于全部非营运货车吨段）
+                    // 商丘濮阳南阳：不承保多用途/双排座货车
                     // 其余城市：多用途/双排座货车另有费率，以备注展示
                     const duoYongTuRates = {
                         '郑州': '3%/3%+11%', '新乡': '3%/3%+11%', '平顶山': '3%/3%+11%',
                         '焦作': '3%/3%+11%', '开封': '3%/3%+11%', '三门峡': '3%/3%+11%',
                         '济源': '3%/3%+11%', '洛阳': '3%/3%+10%'
                     };
-                    if (duoYongTuRates[city]) {
-                        const parts = duoYongTuRates[city].split('/');
-                        note += '；多用途货车/双排座货车：单交 ' + parts[0] + '，交商 ' + parts[1];
-                    } else {
-                        note += '；不含多用途货车/双排座货车';
+                    if (city === '许昌' || city === '驻马店') {
+                        note += '；多用途货车/双排座货车禁保';
+                    } else if (vehicleType === '非营运货车 | 1吨以下') {
+                        if (duoYongTuRates[city]) {
+                            const parts = duoYongTuRates[city].split('/');
+                            note += '；多用途货车/双排座货车：单交 ' + parts[0] + '，交商 ' + parts[1];
+                        } else {
+                            note += '；不含多用途货车/双排座货车';
+                        }
                     }
                 }
                 if (city === '漯河') {
