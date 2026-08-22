@@ -726,38 +726,81 @@
     </footer>
 
     <script>
-        // 华海不支持的城市和车辆类型
-        const huahaiExcludedCities = ['漯河', '信阳', '驻马店', '三门峡', '周口'];
-        const huahaiExcludedVehicleTypes = ['特种车'];
-        const jintaiExcludedCities = ['周口', '南阳', '驻马店', '濮阳', '信阳', '三门峡'];
-        const jintaiNewEnergyCities = ['洛阳', '平顶山', '安阳', '鹤壁', '焦作', '许昌', '济源', '郑州', '开封', '新乡', '漯河', '商丘'];
+        // 锦泰专属车型（不参与其他保司下拉）
         const jintaiOnlyVehicleTypes = ['营运厢货 | 1吨以下', '营运厢货 | 1吨以上'];
-        
-        // 完整的城市和车辆类型列表
-        const allCities = ['郑州', '开封', '洛阳', '平顶山', '安阳', '鹤壁', '新乡', '焦作', '濮阳', '许昌', '漯河', '三门峡', '商丘', '信阳', '驻马店', '南阳', '济源', '周口'];
-        const allVehicleTypes = ['非营运客车', '非营运客车 | 新能源', '营运货车', '非营运货车', '营运厢货 | 1吨以下', '营运厢货 | 1吨以上', '特种车', '校车'];
 
-        // 燕赵各城市可选车辆类型（与费率数据一一对应）
-        const yanzhaoVehicleTypesByCity = {
-            '郑州': ['非营运客车', '非营运企事业客车/救护车', '非营运货车 | 1吨以下', '非营运货车 | 1-1.5吨', '非营运厢货 | 1吨以下', '营运货车 | 1-1.9（含）吨以下', '营运货车 | 1吨以下', '营运厢货 | 1吨以下', '特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车'],
-            '开封': ['非营运客车', '非营运企事业客车/救护车', '非营运货车 | 1吨以下', '非营运货车 | 1-1.5吨', '非营运厢货 | 1吨以下', '营运货车 | 1-1.9（含）吨以下', '营运货车 | 1吨以下', '营运厢货 | 1吨以下', '特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车'],
-            '洛阳': ['非营运客车', '非营运企事业客车/救护车', '非营运货车 | 1吨以下', '非营运货车 | 1-1.5吨', '非营运厢货 | 1吨以下', '营运货车 | 1-1.9（含）吨以下', '营运货车 | 1吨以下', '营运厢货 | 1吨以下', '特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车'],
-            '平顶山': ['非营运客车', '非营运企事业客车/救护车', '非营运货车 | 1吨以下', '非营运货车 | 1-1.5吨', '非营运厢货 | 1吨以下', '营运货车 | 1-1.9（含）吨以下', '营运货车 | 1吨以下', '营运厢货 | 1吨以下', '特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车'],
-            '鹤壁': ['非营运企事业客车/救护车', '特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车'],
-            '焦作': ['非营运客车', '非营运企事业客车/救护车', '非营运货车 | 1吨以下', '非营运货车 | 1-1.5吨', '非营运厢货 | 1吨以下', '营运货车 | 1-1.9（含）吨以下', '营运货车 | 1吨以下', '营运厢货 | 1吨以下', '特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车'],
-            '新乡': ['非营运客车', '非营运货车 | 1吨以下', '非营运货车 | 1-1.5吨', '非营运厢货 | 1吨以下', '营运货车 | 2吨以下', '营运厢货 | 1吨以下', '特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车'],
-            '许昌': ['非营运客车', '非营运企事业客车/救护车', '非营运货车 | 1吨以下', '非营运货车 | 1-1.5吨', '非营运厢货 | 1吨以下', '营运货车 | 1-1.9（含）吨以下', '营运货车 | 1吨以下', '营运厢货 | 1吨以下', '特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车'],
-            '漯河': ['非营运客车', '特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车'],
-            '濮阳': ['非营运企事业客车/救护车', '非营运货车 | 1吨以下', '非营运货车 | 1-1.5吨', '非营运厢货 | 1吨以下', '营运货车 | 1-1.9（含）吨以下', '营运货车 | 1吨以下', '营运厢货 | 1吨以下', '特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车'],
-            '三门峡': ['非营运客车', '非营运企事业客车/救护车', '非营运货车 | 1吨以下', '非营运货车 | 1-1.5吨', '非营运厢货 | 1吨以下', '营运货车 | 1-1.9（含）吨以下', '营运货车 | 1吨以下', '营运厢货 | 1吨以下', '特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车'],
-            '商丘': ['非营运客车', '非营运企事业客车/救护车', '非营运货车 | 1吨以下', '非营运货车 | 1-1.5吨', '非营运厢货 | 1吨以下', '营运货车 | 1-1.9（含）吨以下', '营运货车 | 1吨以下', '营运厢货 | 1吨以下', '特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车'],
-            '济源': ['非营运客车', '非营运企事业客车/救护车', '非营运货车 | 1吨以下', '非营运货车 | 1-1.5吨', '非营运厢货 | 1吨以下', '营运货车 | 1-1.9（含）吨以下', '营运货车 | 1吨以下', '营运厢货 | 1吨以下', '特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车'],
-            '南阳': ['非营运企事业客车/救护车', '非营运货车 | 1吨以下', '非营运货车 | 1-1.5吨', '非营运厢货 | 1吨以下', '营运货车 | 1-1.9（含）吨以下', '营运货车 | 1吨以下', '营运厢货 | 1吨以下', '特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车'],
-            '驻马店': ['非营运客车', '非营运企事业客车/救护车', '非营运货车 | 1吨以下', '非营运货车 | 1-1.5吨', '非营运厢货 | 1吨以下', '营运货车 | 2吨以下', '营运厢货 | 1吨以下', '特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车']
-        };
+        // 城市与车型的展示顺序。
+        // 仅用于排序，不决定可选性；可选性一律由 rates 数据动态推导。
+        // 新增城市/车型时若忘记加进这里，仍会出现在下拉末尾，不会丢失。
+        const cityDisplayOrder = ['郑州', '开封', '洛阳', '平顶山', '安阳', '鹤壁', '新乡', '焦作', '濮阳', '许昌', '漯河', '三门峡', '商丘', '信阳', '驻马店', '南阳', '济源', '周口'];
+        const vehicleTypeDisplayOrder = [
+            '非营运客车', '非营运客车 | 新能源', '非营运企事业客车/救护车',
+            '非营运货车', '非营运货车 | 1吨以下', '非营运货车 | 1-1.5吨', '非营运厢货 | 1吨以下',
+            '营运货车', '营运货车 | 1吨以下', '营运货车 | 1-1.9（含）吨以下', '营运货车 | 2吨以下',
+            '营运厢货 | 1吨以下', '营运厢货 | 1吨以上',
+            '特种车', '特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车',
+            '校车'
+        ];
 
-        // 燕赵未选城市时展示的车辆类型全集（按统一顺序）
-        const yanzhaoAllVehicleTypes = ['非营运客车', '非营运企事业客车/救护车', '非营运货车 | 1吨以下', '非营运货车 | 1-1.5吨', '非营运厢货 | 1吨以下', '营运货车 | 1-1.9（含）吨以下', '营运货车 | 1吨以下', '营运货车 | 2吨以下', '营运厢货 | 1吨以下', '特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车'];
+        // ============================================================
+        // 下拉选项动态推导
+        //
+        // 城市与车型的可选范围全部从 rates 实时读取，不再维护独立的
+        // 排除表或映射表，避免「费率已录入但选不到」「可选但无数据」两类不一致。
+        //
+        // 重要约定：禁保车型必须在 rates 里保留并写成 '禁保'，
+        // 不能为了省事整条删掉。删掉会让选项凭空消失，
+        // 用户看不到「禁保」这个明确结论，只会以为漏录了。
+        // ============================================================
+
+        function sortByDisplayOrder(list, order) {
+            const rank = new Map(order.map(function (v, i) { return [v, i]; }));
+            return list.slice().sort(function (a, b) {
+                const ra = rank.has(a) ? rank.get(a) : Number.MAX_SAFE_INTEGER;
+                const rb = rank.has(b) ? rank.get(b) : Number.MAX_SAFE_INTEGER;
+                if (ra !== rb) return ra - rb;
+                return list.indexOf(a) - list.indexOf(b);
+            });
+        }
+
+        // 该保司有费率数据的保司列表（零数据保司不进下拉）
+        function getAvailableCompanies() {
+            return Object.keys(rates).filter(function (co) {
+                return rates[co] && Object.keys(rates[co]).length > 0;
+            });
+        }
+
+        // 该保司有费率数据的城市；传入 vehicleType 时进一步收窄到有该车型的城市
+        function getAvailableCities(company, vehicleType) {
+            const byCity = rates[company];
+            if (!byCity) return [];
+            let cities = Object.keys(byCity);
+            if (vehicleType) {
+                cities = cities.filter(function (ci) { return byCity[ci][vehicleType]; });
+            }
+            return sortByDisplayOrder(cities, cityDisplayOrder);
+        }
+
+        // 该保司该城市有费率数据的车型；city 为空时返回该保司全部车型并集
+        function getAvailableVehicleTypes(company, city) {
+            const byCity = rates[company];
+            if (!byCity) return [];
+            if (city && byCity[city]) {
+                return sortByDisplayOrder(Object.keys(byCity[city]), vehicleTypeDisplayOrder);
+            }
+            const set = new Set();
+            Object.keys(byCity).forEach(function (ci) {
+                Object.keys(byCity[ci]).forEach(function (v) { set.add(v); });
+            });
+            return sortByDisplayOrder(Array.from(set), vehicleTypeDisplayOrder);
+        }
+
+        // 重建下拉并尽量保留原选中值，原值不在新列表中则清空
+        function rebuildPreservingValue(selectEl, options) {
+            const prev = selectEl.value;
+            rebuildSelectOptions(selectEl, options);
+            selectEl.value = options.indexOf(prev) >= 0 ? prev : '';
+        }
         
         // 重建下拉选项
         function rebuildSelectOptions(selectEl, allOptions) {
@@ -866,10 +909,6 @@
             }
         });
 
-        // 国任支持的城市和车辆类型
-        const guorenCities = ['郑州', '三门峡', '济源'];
-        const guorenVehicleTypes = ['非营运客车'];
-
         document.getElementById('insuranceCompany').addEventListener('change', function () {
             const company = this.value;
             const citySelect = document.getElementById('city');
@@ -880,11 +919,9 @@
             const underwritingConditionField = document.getElementById('underwritingConditionField');
 
             if (company === '华海') {
-                const huahaiCities = allCities.filter(c => !huahaiExcludedCities.includes(c));
-                const huahaiVehicles = allVehicleTypes.filter(v => !huahaiExcludedVehicleTypes.includes(v) && !jintaiOnlyVehicleTypes.includes(v));
-                rebuildSelectOptions(citySelect, huahaiCities);
-                rebuildSelectOptions(vehicleTypeSelect, huahaiVehicles);
-                citySelect.value = '商丘';
+                rebuildSelectOptions(citySelect, getAvailableCities(company));
+                citySelect.value = getAvailableCities(company).indexOf('商丘') >= 0 ? '商丘' : '';
+                rebuildSelectOptions(vehicleTypeSelect, getAvailableVehicleTypes(company, citySelect.value));
                 hasCarAccidentField.style.display = 'none';
                 hasPersonnelField.style.display = 'none';
                 isPremiumVehicleField.style.display = 'none';
@@ -892,11 +929,11 @@
                 document.getElementById('isTransferField').style.display = 'block';
                 document.getElementById('businessTypeField').style.display = 'block';
             } else if (company === '国任') {
-                const guorenVehicles = guorenVehicleTypes.filter(v => !jintaiOnlyVehicleTypes.includes(v));
-                rebuildSelectOptions(citySelect, guorenCities);
+                rebuildSelectOptions(citySelect, getAvailableCities(company));
+                citySelect.value = getAvailableCities(company).indexOf('郑州') >= 0 ? '郑州' : '';
+                const guorenVehicles = getAvailableVehicleTypes(company, citySelect.value);
                 rebuildSelectOptions(vehicleTypeSelect, guorenVehicles);
-                citySelect.value = '郑州';
-                vehicleTypeSelect.value = '非营运客车';
+                vehicleTypeSelect.value = guorenVehicles.length === 1 ? guorenVehicles[0] : '';
                 hasCarAccidentField.style.display = 'none';
                 hasPersonnelField.style.display = 'none';
                 isPremiumVehicleField.style.display = 'none';
@@ -904,10 +941,8 @@
                 document.getElementById('isTransferField').style.display = 'block';
                 document.getElementById('businessTypeField').style.display = 'block';
             } else if (company === '锦泰') {
-                const jintaiCities = allCities.filter(c => !jintaiExcludedCities.includes(c));
-                const jintaiVehicles = allVehicleTypes.filter(v => v !== '校车');
-                rebuildSelectOptions(citySelect, jintaiCities);
-                rebuildSelectOptions(vehicleTypeSelect, jintaiVehicles);
+                rebuildSelectOptions(citySelect, getAvailableCities(company));
+                rebuildSelectOptions(vehicleTypeSelect, getAvailableVehicleTypes(company));
                 citySelect.value = '';
                 vehicleTypeSelect.value = '';
                 hasCarAccidentField.style.display = 'block';
@@ -918,8 +953,8 @@
                 document.getElementById('isTransferField').style.display = 'none';
                 document.getElementById('businessTypeField').style.display = 'none';
             } else if (company === '燕赵') {
-                rebuildSelectOptions(citySelect, allCities);
-                rebuildSelectOptions(vehicleTypeSelect, yanzhaoAllVehicleTypes);
+                rebuildSelectOptions(citySelect, getAvailableCities(company));
+                rebuildSelectOptions(vehicleTypeSelect, getAvailableVehicleTypes(company));
                 // 强制重置为第一个选项（空值）
                 citySelect.selectedIndex = 0;
                 vehicleTypeSelect.selectedIndex = 0;
@@ -933,9 +968,8 @@
                 document.getElementById('isTransferField').style.display = 'none';
                 document.getElementById('businessTypeField').style.display = 'block';
             } else {
-                const otherVehicles = allVehicleTypes.filter(v => !jintaiOnlyVehicleTypes.includes(v));
-                rebuildSelectOptions(citySelect, allCities);
-                rebuildSelectOptions(vehicleTypeSelect, otherVehicles);
+                rebuildSelectOptions(citySelect, getAvailableCities(company));
+                rebuildSelectOptions(vehicleTypeSelect, getAvailableVehicleTypes(company));
                 citySelect.value = '';
                 vehicleTypeSelect.value = '';
                 hasCarAccidentField.style.display = 'none';
@@ -966,12 +1000,16 @@
 
             if (company === '锦泰' && vehicleType === '非营运客车 | 新能源') {
                 isPremiumVehicleField.style.display = 'block';
-                // 新能源只在这几个城市有费率数据
-                applyOptionFilter(citySelect, [], jintaiNewEnergyCities);
             } else if (company === '锦泰') {
                 isPremiumVehicleField.style.display = 'none';
                 document.getElementById('isPremiumVehicle').value = '否';
-                applyOptionFilter(citySelect, jintaiExcludedCities);
+            }
+
+            // 车型变化时按该车型收窄城市列表（仅保留有该车型费率的城市）
+            if (company && vehicleType) {
+                rebuildPreservingValue(citySelect, getAvailableCities(company, vehicleType));
+            } else if (company) {
+                rebuildPreservingValue(citySelect, getAvailableCities(company));
             }
             
             // 燕赵：所有车辆类型都不显示是否过户字段
@@ -1005,47 +1043,44 @@
             }
         }
 
-        // 页面加载时设置初始默认值
-        (function() {
+        // 页面初始默认值。
+        // 依赖 rates，因此实际调用放在脚本末尾（rates 声明之后）执行。
+        function initFormDefaults() {
             const companySelect = document.getElementById('insuranceCompany');
             const citySelect = document.getElementById('city');
             const vehicleTypeSelect = document.getElementById('vehicleType');
             const businessTypeSelect = document.getElementById('businessType');
 
+            // 移除尚未收录费率的保司，避免选中后城市下拉空白
+            const availableCompanies = getAvailableCompanies();
+            Array.from(companySelect.options).forEach(function (opt) {
+                if (opt.value && availableCompanies.indexOf(opt.value) < 0) {
+                    companySelect.removeChild(opt);
+                }
+            });
+
             // 默认业务类型为转保
             businessTypeSelect.value = '转保';
 
             // 默认投保公司为华海，城市为商丘
-            companySelect.value = '华海';
-            const huahaiCities = allCities.filter(c => !huahaiExcludedCities.includes(c));
-            const huahaiVehicles = allVehicleTypes.filter(v => !huahaiExcludedVehicleTypes.includes(v) && !jintaiOnlyVehicleTypes.includes(v));
-            rebuildSelectOptions(citySelect, huahaiCities);
-            rebuildSelectOptions(vehicleTypeSelect, huahaiVehicles);
-            citySelect.value = '商丘';
-        })();
+            const defaultCompany = availableCompanies.indexOf('华海') >= 0 ? '华海' : (availableCompanies[0] || '');
+            companySelect.value = defaultCompany;
+            if (!defaultCompany) return;
 
-        // 城市变化时过滤车辆类型
+            const cities = getAvailableCities(defaultCompany);
+            rebuildSelectOptions(citySelect, cities);
+            citySelect.value = cities.indexOf('商丘') >= 0 ? '商丘' : '';
+            rebuildSelectOptions(vehicleTypeSelect, getAvailableVehicleTypes(defaultCompany, citySelect.value));
+        }
+
+        // 城市变化时按城市重建车辆类型选项（仅保留该城市有费率的车型）
         document.getElementById('city').addEventListener('change', function () {
             const company = document.getElementById('insuranceCompany').value;
             const city = this.value;
-            const vehicleType = document.getElementById('vehicleType').value;
             const vehicleTypeSelect = document.getElementById('vehicleType');
 
-            if (company === '华海') {
-                // 华海：校车仅在安阳时显示
-                const baseVehicles = allVehicleTypes.filter(v => !huahaiExcludedVehicleTypes.includes(v) && !jintaiOnlyVehicleTypes.includes(v));
-                if (city === '安阳') {
-                    rebuildSelectOptions(vehicleTypeSelect, baseVehicles);
-                } else {
-                    rebuildSelectOptions(vehicleTypeSelect, baseVehicles.filter(v => v !== '校车'));
-                }
-            }
-            // 燕赵：按城市重建车辆类型选项（仅保留该城市有费率的车型）
-            if (company === '燕赵') {
-                const prev = vehicleTypeSelect.value;
-                const available = city ? (yanzhaoVehicleTypesByCity[city] || []) : yanzhaoAllVehicleTypes;
-                rebuildSelectOptions(vehicleTypeSelect, available);
-                vehicleTypeSelect.value = available.includes(prev) ? prev : '';
+            if (company) {
+                rebuildPreservingValue(vehicleTypeSelect, getAvailableVehicleTypes(company, city));
             }
             // 燕赵：城市变化时控制承保条件字段
             updateYanzhaoUnderwriting();
@@ -1055,22 +1090,6 @@
         document.getElementById('businessType').addEventListener('change', function () {
             updateYanzhaoUnderwriting();
         });
-
-        function applyOptionFilter(selectEl, excluded, allowed) {
-            const allOptions = Array.from(selectEl.options);
-            allOptions.forEach(function (option) {
-                if (option.value === '') return;
-                let shouldHide;
-                if (allowed && allowed.length > 0) {
-                    shouldHide = !allowed.includes(option.value);
-                } else {
-                    shouldHide = excluded.includes(option.value);
-                }
-                if (shouldHide) {
-                    selectEl.removeChild(option);
-                }
-            });
-        }
 
         document.getElementById('insuranceForm').addEventListener('submit', async function (e) {
             e.preventDefault();
@@ -5154,6 +5173,11 @@
                 return { rate: '暂无数据', note: note };
             }
         }
+
+        // 以下初始化依赖 rates，必须在 rates 声明之后执行
+
+        // 按数据实际收录情况初始化保司/城市/车型下拉
+        initFormDefaults();
 
         // 首页展示已收录费率的保险公司及其覆盖城市数
         (function renderHeroCompanies() {
