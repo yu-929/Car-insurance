@@ -2140,7 +2140,7 @@
                 // 锦泰多一层车驾意维度
                 if (company === '锦泰') {
                     const carAccidentKey = hasCarAccident === '是' ? '含车驾意' : '不含车驾意';
-                    const rate = rates[company][city][vehicleType][carAccidentKey][effectiveType][insuranceType];
+                    const rate = rates[company][city][vehicleType][effectiveType][carAccidentKey][insuranceType];
                     return { rate: rate || '暂无数据', note: note };
                 }
                 const rate = rates[company][city][vehicleType][effectiveType][insuranceType];
