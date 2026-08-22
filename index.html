@@ -646,105 +646,7 @@
         // 华海不支持的城市和车辆类型
         const huahaiExcludedCities = ['漯河', '信阳', '驻马店', '三门峡', '周口'];
         const huahaiExcludedVehicleTypes = ['非营运客车【新能源】', '特种车'];
-
-        // 上报费率弹窗
-        const reportModal = document.getElementById('reportModal');
-        const reportPassword = document.getElementById('reportPassword');
-        const newRateInput = document.getElementById('newRate');
-        const reportNote = document.getElementById('reportNote');
-        const reportError = document.getElementById('reportError');
-        const reportCancel = document.getElementById('reportCancel');
-        const reportSubmit = document.getElementById('reportSubmit');
-        const REPORT_PASSWORD = '0929';
-
-        // 点击费率打开上报弹窗
-        document.getElementById('resultRate').addEventListener('click', function() {
-            const currentRate = this.textContent;
-            if (currentRate && currentRate !== '暂无数据') {
-                newRateInput.value = currentRate;
-                // 获取当前备注并填入
-                const currentNote = document.getElementById('resultNote').textContent;
-                reportNote.value = currentNote ? currentNote.replace('备注信息：', '') : '';
-                reportModal.classList.add('active');
-            }
-        });
-
-        reportCancel.addEventListener('click', function() {
-            reportModal.classList.remove('active');
-            reportPassword.value = '';
-            newRateInput.value = '';
-            reportNote.value = '';
-            reportError.style.display = 'none';
-        });
-
-        reportSubmit.addEventListener('click', async function() {
-            if (reportPassword.value !== REPORT_PASSWORD) {
-                reportError.textContent = '密码错误，请重试';
-                reportError.style.display = 'block';
-                return;
-            }
-            if (!newRateInput.value.trim()) {
-                reportError.textContent = '请输入新费率';
-                reportError.style.display = 'block';
-                return;
-            }
-
-            // 获取当前查询条件
-            const company = document.getElementById('insuranceCompany').value;
-            const city = document.getElementById('city').value;
-            const businessType = document.getElementById('businessType').value;
-            const insuranceType = document.getElementById('insuranceType').value;
-            const vehicleType = document.getElementById('vehicleType').value;
-            const oldRate = document.getElementById('resultRate').textContent;
-
-            try {
-                const response = await fetch('/api/report-rate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        company,
-                        city,
-                        vehicleType,
-                        businessType,
-                        insuranceType,
-                        oldRate,
-                        newRate: newRateInput.value.trim(),
-                        note: reportNote.value.trim()
-                    })
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    alert('费率上报成功！');
-                    reportModal.classList.remove('active');
-                    reportPassword.value = '';
-                    newRateInput.value = '';
-                    reportNote.value = '';
-                    reportError.style.display = 'none';
-                } else {
-                    reportError.textContent = result.error || '上报失败，请重试';
-                    reportError.style.display = 'block';
-                }
-            } catch (error) {
-                reportError.textContent = '网络错误，请检查服务器连接';
-                reportError.style.display = 'block';
-            }
-        });
-
-        reportModal.addEventListener('click', function(e) {
-            if (e.target === reportModal) {
-                reportModal.classList.remove('active');
-                reportPassword.value = '';
-                newRateInput.value = '';
-                reportNote.value = '';
-                reportError.style.display = 'none';
-            }
-        });
-
-        // 国任支持的城市和车辆类型
+        const jintaiExcludedCities = ['周口', '南阳', '驻马店', '濮阳', '信阳', '三门峡'];
         const guorenCities = ['郑州', '三门峡', '济源'];
         const guorenVehicleTypes = ['非营运客车'];
 
@@ -769,7 +671,7 @@
                 hasCarAccidentField.style.display = 'none';
                 hasPersonnelField.style.display = 'none';
             } else if (company === '锦泰') {
-                applyOptionFilter(citySelect, []);
+                applyOptionFilter(citySelect, jintaiExcludedCities);
                 applyOptionFilter(vehicleTypeSelect, []);
                 citySelect.value = '';
                 vehicleTypeSelect.value = '';
@@ -1730,6 +1632,107 @@
                             }
                         }
                     }
+                },
+                '锦泰': {
+                    '郑州': {
+                        '非营运客车': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '12%',
+                                '交商共保': '2%+12%'
+                            }
+                        }
+                    },
+                    '开封': {
+                        '非营运客车': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '12%',
+                                '交商共保': '2%+12%'
+                            }
+                        }
+                    },
+                    '洛阳': {
+                        '非营运客车': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '12%',
+                                '交商共保': '2%+12%'
+                            }
+                        }
+                    },
+                    '平顶山': {
+                        '非营运客车': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '12%',
+                                '交商共保': '2%+12%'
+                            }
+                        }
+                    },
+                    '安阳': {
+                        '非营运客车': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '12%',
+                                '交商共保': '2%+12%'
+                            }
+                        }
+                    },
+                    '鹤壁': {
+                        '非营运客车': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '12%',
+                                '交商共保': '2%+12%'
+                            }
+                        }
+                    },
+                    '新乡': {
+                        '非营运客车': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '12%',
+                                '交商共保': '2%+12%'
+                            }
+                        }
+                    },
+                    '焦作': {
+                        '非营运客车': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '12%',
+                                '交商共保': '2%+12%'
+                            }
+                        }
+                    },
+                    '许昌': {
+                        '非营运客车': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '12%',
+                                '交商共保': '2%+12%'
+                            }
+                        }
+                    },
+                    '商丘': {
+                        '非营运客车': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '12%',
+                                '交商共保': '2%+12%'
+                            }
+                        }
+                    },
+                    '济源': {
+                        '非营运客车': {
+                            '转保': {
+                                '单交强': '禁保',
+                                '单商业': '12%',
+                                '交商共保': '2%+12%'
+                            }
+                        }
+                    }
                 }
             };
 
@@ -1741,6 +1744,12 @@
                     note = '单交搭售B区交通工具意外险特惠款保费50元，费用35%';
                 } else {
                     note = '不含损搭售B区交通工具意外险基础款保费100元，费用35%；含损搭售B区交通工具意外险升级款保费200元，费用35%';
+                }
+            } else if (company === '锦泰') {
+                if (hasCarAccident === '是') {
+                    note = '非车费用30%，200元车驾意商业16%';
+                } else {
+                    note = '非车费用30%';
                 }
             } else if (vehicleType === '营运货车') {
                 if (city === '洛阳') {
