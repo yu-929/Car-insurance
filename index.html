@@ -887,8 +887,9 @@
                 applyOptionFilter(citySelect, jintaiExcludedCities);
             }
             
-            // 燕赵：只有非营运客车显示承保条件字段
+            // 燕赵：所有车辆类型都不显示是否过户字段
             if (company === '燕赵') {
+                document.getElementById('isTransferField').style.display = 'none';
                 if (vehicleType === '非营运客车') {
                     underwritingConditionField.style.display = 'block';
                 } else {
