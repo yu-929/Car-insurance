@@ -958,18 +958,10 @@
             const yanzhaoCitiesWithUnderwriting = ['郑州', '焦作', '商丘', '许昌', '平顶山', '漯河', '新乡'];
             const city = document.getElementById('city').value;
 
-            if (company === '燕赵' && vehicleType === '非营运客车') {
+            if (company === '燕赵' && vehicleType === '非营运客车' && yanzhaoCitiesWithUnderwriting.includes(city)) {
                 if (businessType === '新车') {
-                    // 新车时显示承保条件并自动选择非常规车型
-                    underwritingConditionField.style.display = 'block';
                     document.getElementById('underwritingCondition').value = '非常规车型';
-                } else if (yanzhaoCitiesWithUnderwriting.includes(city)) {
-                    // 非新车但在允许城市，显示承保条件并重置为常规车型
-                    underwritingConditionField.style.display = 'block';
-                    document.getElementById('underwritingCondition').selectedIndex = 0;
                 } else {
-                    // 非新车且不在允许城市，隐藏承保条件
-                    underwritingConditionField.style.display = 'none';
                     document.getElementById('underwritingCondition').selectedIndex = 0;
                 }
             }
