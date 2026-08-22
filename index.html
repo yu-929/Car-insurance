@@ -771,7 +771,7 @@
 
             if (company === '华海') {
                 applyOptionFilter(citySelect, huahaiExcludedCities);
-                applyOptionFilter(vehicleTypeSelect, huahaiExcludedVehicleTypes);
+                applyOptionFilter(vehicleTypeSelect, [...huahaiExcludedVehicleTypes, ...jintaiOnlyVehicleTypes]);
                 citySelect.value = '商丘';
                 hasCarAccidentField.style.display = 'none';
                 hasPersonnelField.style.display = 'none';
@@ -779,8 +779,9 @@
                 document.getElementById('isTransferField').style.display = 'block';
                 document.getElementById('businessTypeField').style.display = 'block';
             } else if (company === '国任') {
+                const guorenFiltered = guorenVehicleTypes.filter(v => !jintaiOnlyVehicleTypes.includes(v));
                 applyOptionFilter(citySelect, [], guorenCities);
-                applyOptionFilter(vehicleTypeSelect, [], guorenVehicleTypes);
+                applyOptionFilter(vehicleTypeSelect, [], guorenFiltered);
                 citySelect.value = '郑州';
                 vehicleTypeSelect.value = '非营运客车';
                 hasCarAccidentField.style.display = 'none';
