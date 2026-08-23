@@ -555,7 +555,7 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 14:12</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 14:44</span>
         </div>
     </nav>
 
@@ -1000,15 +1000,22 @@
             const company = document.getElementById('insuranceCompany').value;
             const vehicleType = this.value;
             const hasPersonnelField = document.getElementById('hasPersonnelField');
+            const hasCarAccidentField = document.getElementById('hasCarAccidentField');
             const isPremiumVehicleField = document.getElementById('isPremiumVehicleField');
             const citySelect = document.getElementById('city');
             const underwritingConditionField = document.getElementById('underwritingConditionField');
 
             if (company === '锦泰' && vehicleType === '特种车') {
+                // 特种车按「是否含人员」定价，车驾意与其无关，避免让用户误以为会影响结果
                 hasPersonnelField.style.display = 'block';
+                hasCarAccidentField.style.display = 'none';
+                document.getElementById('hasCarAccident').value = '否';
             } else {
                 hasPersonnelField.style.display = 'none';
                 document.getElementById('hasPersonnel').value = '否';
+                if (company === '锦泰') {
+                    hasCarAccidentField.style.display = 'block';
+                }
             }
 
             if (company === '锦泰' && vehicleType === '非营运客车 | 新能源') {
@@ -1176,9 +1183,11 @@
                 items = items.filter(function(item) {
                     return item[0] !== '业务类型' && item[0] !== '是否过户';
                 });
-                items.push(['是否含车驾意', hasCarAccident]);
+                // 特种车按含人员定价，车驾意不参与，故不展示车驾意
                 if (vehicleType === '特种车') {
                     items.push(['是否含人员', hasPersonnel]);
+                } else {
+                    items.push(['是否含车驾意', hasCarAccident]);
                 }
                 if (vehicleType === '非营运客车 | 新能源') {
                     items.push(['是否优质车型', isPremiumVehicle]);
@@ -5107,7 +5116,10 @@
                     note = '不含损搭售B区交通工具意外险基础款保费100元，费用35%；含损搭售B区交通工具意外险升级款保费200元，费用35%';
                 }
             } else if (company === '锦泰') {
-                if (vehicleType === '非营运客车 | 新能源') {
+                if (vehicleType === '特种车') {
+                    // 特种车费率只按「是否含人员」区分，不搭售车驾意
+                    note = '非车费用30%';
+                } else if (vehicleType === '非营运客车 | 新能源') {
                     if (isPremiumVehicle === '是') {
                         if (hasCarAccident === '是') {
                             note = '非车费用30%，200元车驾意商业10%';
