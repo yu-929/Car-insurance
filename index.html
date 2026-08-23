@@ -555,7 +555,7 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 20:03</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 20:41</span>
         </div>
     </nav>
 
@@ -698,6 +698,14 @@
                         <select id="underwritingCondition">
                             <option value="常规车型">常规车型</option>
                             <option value="非常规车型">非常规车型（多用途旅行车｜过户车｜新车）</option>
+                        </select>
+                    </div>
+                    <div class="field" id="tiananScoreField" style="display:none;">
+                        <label for="tiananScore">天安标费</label>
+                        <select id="tiananScore">
+                            <option value="30分以上">30分以上</option>
+                            <option value="30-40分">30-40分</option>
+                            <option value="40分以上">40分以上</option>
                         </select>
                     </div>
                 </div>
@@ -980,6 +988,22 @@
                 document.getElementById('underwritingCondition').selectedIndex = 0;
                 document.getElementById('isTransferField').style.display = 'none';
                 document.getElementById('businessTypeField').style.display = 'block';
+                document.getElementById('tiananScoreField').style.display = 'none';
+            } else if (company === '申能') {
+                rebuildSelectOptions(citySelect, getAvailableCities(company));
+                citySelect.value = getAvailableCities(company).indexOf('郑州') >= 0 ? '郑州' : '';
+                const shenNengVehicles = getAvailableVehicleTypes(company, citySelect.value);
+                rebuildSelectOptions(vehicleTypeSelect, shenNengVehicles);
+                vehicleTypeSelect.value = shenNengVehicles.length === 1 ? shenNengVehicles[0] : '';
+                document.getElementById('businessType').value = '转保';
+                document.getElementById('tiananScore').selectedIndex = 0;
+                hasCarAccidentField.style.display = 'none';
+                hasPersonnelField.style.display = 'none';
+                isPremiumVehicleField.style.display = 'none';
+                underwritingConditionField.style.display = 'none';
+                document.getElementById('isTransferField').style.display = 'block';
+                document.getElementById('businessTypeField').style.display = 'block';
+                document.getElementById('tiananScoreField').style.display = 'block';
             } else {
                 rebuildSelectOptions(citySelect, getAvailableCities(company));
                 rebuildSelectOptions(vehicleTypeSelect, getAvailableVehicleTypes(company));
@@ -992,6 +1016,7 @@
                 document.getElementById('businessTypeField').style.display = 'block';
                 isPremiumVehicleField.style.display = 'none';
                 underwritingConditionField.style.display = 'none';
+                document.getElementById('tiananScoreField').style.display = 'none';
             }
         });
 
@@ -1192,6 +1217,11 @@
                 if (vehicleType === '非营运客车 | 新能源') {
                     items.push(['是否优质车型', isPremiumVehicle]);
                 }
+            }
+
+            // 申能显示天安标费档位
+            if (insuranceCompany === '申能') {
+                items.push(['天安标费', document.getElementById('tiananScore').value]);
             }
 
             document.getElementById('resultList').innerHTML = items
@@ -5238,6 +5268,34 @@
                         '新车': { '单交强': '禁保', '单商业': '9%', '交商共保': '9%+9%' }
                     }
                 }
+            },
+            '申能': {
+                '郑州': {
+                    '非营运客车': {
+                        '转保': {
+                            '30分以上': { '单交强': '4%', '单商业': '13%', '交商共保': '暂无数据' },
+                            '30-40分': { '单交强': '暂无数据', '单商业': '13%', '交商共保': '8%+10%' },
+                            '40分以上': { '单交强': '暂无数据', '单商业': '13%', '交商共保': '14%+16%' }
+                        },
+                        '续保': {
+                            '30分以上': { '单交强': '6%', '单商业': '13%', '交商共保': '暂无数据' },
+                            '30-40分': { '单交强': '暂无数据', '单商业': '13%', '交商共保': '13%+13%' },
+                            '40分以上': { '单交强': '暂无数据', '单商业': '13%', '交商共保': '14%+16%' }
+                        }
+                    },
+                    '非营运客车 | 新能源': {
+                        '转保': {
+                            '30分以上': { '单交强': '4%', '单商业': '13%', '交商共保': '暂无数据' },
+                            '30-40分': { '单交强': '暂无数据', '单商业': '13%', '交商共保': '8%+10%' },
+                            '40分以上': { '单交强': '暂无数据', '单商业': '13%', '交商共保': '14%+16%' }
+                        },
+                        '续保': {
+                            '30分以上': { '单交强': '6%', '单商业': '13%', '交商共保': '暂无数据' },
+                            '30-40分': { '单交强': '暂无数据', '单商业': '13%', '交商共保': '13%+13%' },
+                            '40分以上': { '单交强': '暂无数据', '单商业': '13%', '交商共保': '14%+16%' }
+                        }
+                    }
+                }
             }
         };
 
@@ -5280,6 +5338,11 @@
                         ? [company, city, vehicleType, '常规车型']
                         : [company, city, vehicleType];
                 }
+            } else if (company === '申能') {
+                // 申能：仅郑州；过户按转保档走；费率按天安标费档位分层（30分以下禁保不在此列）
+                const tiananEl = typeof document !== 'undefined' && document.getElementById('tiananScore');
+                const tiananScore = tiananEl ? tiananEl.value : '30分以上';
+                path = [company, city, vehicleType, isTransfer === '是' ? '转保' : businessType, tiananScore || '30分以上'];
             } else {
                 path = [company, city, vehicleType, isTransfer === '是' ? '过户' : businessType];
             }
@@ -5484,6 +5547,26 @@
                         note += '；开封转保交商含损 6+19、不含损 5+18（站内按含损计）';
                     }
                 }
+            }
+
+            // 申能备注
+            if (company === '申能') {
+                note = '商业三者须≥200万；天马标费及天马核保评分均需在30分以上，低于30分禁保；单商业上限13，低于按实际（转保及过户）';
+                const tiananEl = typeof document !== 'undefined' && document.getElementById('tiananScore');
+                const tiananScore = tiananEl ? tiananEl.value : '30分以上';
+                if (businessType === '续保') {
+                    note += '；续保业务（含单商、交商）可续保前3天（28-30天）内加2%';
+                }
+                if (insuranceType === '单交强' && tiananScore === '30分以上') {
+                    note += '；加驾乘险（≥59元驾乘）：转保单交' + (businessType === '续保' ? '11' : '7') + '%';
+                } else if (insuranceType === '交商共保') {
+                    if (tiananScore === '30-40分') {
+                        note += '；加驾乘险（≥59元驾乘）：' + (businessType === '续保' ? '13+17' : '8+14');
+                    } else if (tiananScore === '40分以上') {
+                        note += '；加驾乘险（≥59元驾乘）：14+20';
+                    }
+                }
+                note += '；驾乘费用：219元驾乘25%，139元驾乘20%';
             }
 
             try {
