@@ -555,7 +555,7 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 19:31</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 20:03</span>
         </div>
     </nav>
 
@@ -5473,12 +5473,13 @@
 
             // 利宝备注
             if (company === '利宝') {
+                note = '非车费用45%';
                 if (vehicleType === '非营运客车 | 新能源') {
-                    note = '新能源客车必须含损联保（含车损），单交禁保；新车含损联保及单商：交商 9+9，单商 9';
+                    note += '；新能源客车必须含损联保（含车损），单交禁保；新车含损联保及单商：交商 9+9，单商 9';
                 } else if (businessType === '新车') {
-                    note = '新车含损联保及单商：交商 5+13，单商 13；单交禁保';
+                    note += '；新车含损联保及单商：交商 5+13，单商 13；单交禁保';
                 } else {
-                    note = '交商联保单：转保/续保按城市；单商按交商商业点数';
+                    note += '；交商联保单：转保/续保按城市；单商按交商商业点数';
                     if (city === '开封' && businessType === '转保') {
                         note += '；开封转保交商含损 6+19、不含损 5+18（站内按含损计）';
                     }
