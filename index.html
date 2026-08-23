@@ -555,7 +555,7 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-22 13:47</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 08:39</span>
         </div>
     </nav>
 
@@ -823,6 +823,10 @@
         const reportSubmit = document.getElementById('reportSubmit');
         const REPORT_PASSWORD = '0929';
 
+        // 当前结果区展示的那一次查询。上报必须绑定这次查询，
+        // 而不是重新读表单——用户可能在看结果时又改了下拉但没重新查询
+        let currentQueryContext = null;
+
         // 点击费率打开上报弹窗
         document.getElementById('resultRate').addEventListener('click', function() {
             const currentRate = this.textContent;
@@ -854,12 +858,18 @@
                 return;
             }
 
-            // 获取当前查询条件
-            const company = document.getElementById('insuranceCompany').value;
-            const city = document.getElementById('city').value;
-            const businessType = document.getElementById('businessType').value;
-            const insuranceType = document.getElementById('insuranceType').value;
-            const vehicleType = document.getElementById('vehicleType').value;
+            // 获取当前查询条件（取结果区对应的那次查询，避免与改动后的表单错位）
+            if (!currentQueryContext) {
+                reportError.textContent = '请先查询费率后再上报';
+                reportError.style.display = 'block';
+                return;
+            }
+            const company = currentQueryContext.company;
+            const city = currentQueryContext.city;
+            const businessType = currentQueryContext.businessType;
+            const insuranceType = currentQueryContext.insuranceType;
+            const vehicleType = currentQueryContext.vehicleType;
+            const rateKey = currentQueryContext.rateKey;
             const oldRate = document.getElementById('resultRate').textContent;
 
             try {
@@ -874,6 +884,7 @@
                         vehicleType,
                         businessType,
                         insuranceType,
+                        rateKey,
                         oldRate,
                         newRate: newRateInput.value.trim(),
                         note: reportNote.value.trim()
@@ -1105,7 +1116,17 @@
             const isPremiumVehicle = document.getElementById('isPremiumVehicle').value;
             const underwritingCondition = document.getElementById('underwritingCondition').value;
 
-            const rateInfo = getRateInfo(insuranceCompany, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle, hasPersonnel);
+            const rateInfo = getRateInfo(insuranceCompany, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle, hasPersonnel, underwritingCondition);
+
+            // 记录本次查询，供上报时精确绑定到同一格费率
+            currentQueryContext = {
+                company: insuranceCompany,
+                city: city,
+                businessType: businessType,
+                insuranceType: insuranceType,
+                vehicleType: vehicleType,
+                rateKey: rateInfo.rateKey || ''
+            };
 
             // 从数据库获取已审核通过的最新费率与备注，覆盖内置数据
             let displayRate = rateInfo.rate;
@@ -1119,6 +1140,9 @@
                     businessType: businessType,
                     insuranceType: insuranceType
                 });
+                if (rateInfo.rateKey) {
+                    params.set('rateKey', rateInfo.rateKey);
+                }
                 const response = await fetch('/api/latest-note?' + params.toString());
                 const data = await response.json();
                 if (data.new_rate) {
@@ -4971,7 +4995,87 @@
             }
         };
 
-        function getRateInfo(company, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle, hasPersonnel) {
+        // ============================================================
+        // 费率取值路径解析
+        //
+        // 各保司在 rates 下的维度层级不同（锦泰按车驾意/人员/优质车型分层，
+        // 燕赵按承保条件分层，其余按业务类型/过户分层）。
+        // 这里把「该组合到底由哪些维度决定」显式算成一条路径，
+        // 既供取值使用，也作为费率上报的覆盖键（rateKey），
+        // 保证一条上报只影响它真正对应的那一格。
+        // ============================================================
+
+        const YANZHAO_UNDERWRITING_CITIES = ['郑州', '焦作', '商丘', '许昌', '平顶山', '漯河', '新乡'];
+
+        function resolveRatePath(company, city, businessType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle, hasPersonnel, underwritingCondition) {
+            let path;
+
+            if (company === '锦泰') {
+                if (vehicleType === '特种车') {
+                    path = [company, city, vehicleType, hasPersonnel === '是' ? '含人员' : '不含人员'];
+                } else {
+                    const carAccidentKey = hasCarAccident === '是' ? '含车驾意' : '不含车驾意';
+                    if (vehicleType === '非营运客车 | 新能源') {
+                        path = [company, city, vehicleType, carAccidentKey, isPremiumVehicle === '是' ? '优质车型' : '非优质车型'];
+                    } else {
+                        path = [company, city, vehicleType, carAccidentKey];
+                    }
+                }
+            } else if (company === '燕赵') {
+                if (vehicleType === '非营运客车') {
+                    // 仅部分城市区分承保条件，其余城市固定走常规车型
+                    path = YANZHAO_UNDERWRITING_CITIES.indexOf(city) >= 0
+                        ? [company, city, vehicleType, underwritingCondition || '常规车型']
+                        : [company, city, vehicleType, '常规车型'];
+                } else {
+                    // 其他车型不区分承保条件；数据仍带常规车型层时下沉一层
+                    const node = rates[company] && rates[company][city] && rates[company][city][vehicleType];
+                    path = (node && node['常规车型'])
+                        ? [company, city, vehicleType, '常规车型']
+                        : [company, city, vehicleType];
+                }
+            } else {
+                path = [company, city, vehicleType, isTransfer === '是' ? '过户' : businessType];
+            }
+
+            // 规则性禁保：不依赖 rates 中是否录入
+            let ban = null;
+            if (company === '国任' && isTransfer === '是' && businessType === '续保') {
+                ban = '禁保';
+            } else if (company === '锦泰') {
+                const truckTypes = ['营运货车', '非营运货车', '营运厢货 | 1吨以下', '营运厢货 | 1吨以上'];
+                if ((city === '安阳' || city === '鹤壁') && truckTypes.indexOf(vehicleType) >= 0) {
+                    ban = '禁保';
+                }
+            } else if (company === '燕赵') {
+                const specialVehicleTypes = ['特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车'];
+                if (specialVehicleTypes.indexOf(vehicleType) >= 0 && (city === '安阳' || city === '信阳' || city === '周口')) {
+                    ban = '禁保';
+                } else if (vehicleType === '非营运企事业客车/救护车' && (city === '安阳' || city === '信阳')) {
+                    ban = '禁保';
+                }
+            }
+
+            return { path: path, ban: ban };
+        }
+
+        // 按路径读取费率。缺失时返回中断位置，便于区分「数据没录」和「确实没这个费率」
+        function readRateByPath(path, insuranceType) {
+            let node = rates;
+            const full = path.concat(insuranceType);
+            for (let i = 0; i < full.length; i++) {
+                if (!node || typeof node !== 'object' || !(full[i] in node)) {
+                    return { missing: true, missingAt: full.slice(0, i + 1).join(' / ') };
+                }
+                node = node[full[i]];
+            }
+            if (node === undefined || node === null || node === '') {
+                return { missing: true, missingAt: full.join(' / ') };
+            }
+            return { rate: node };
+        }
+
+        function getRateInfo(company, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle, hasPersonnel, underwritingCondition) {
 
             let note = '';
             if (company === '国任') {
@@ -5103,72 +5207,29 @@
             }
 
             try {
-                // 过户优先查询
-                const effectiveType = isTransfer === '是' ? '过户' : businessType;
-                // 国任过户无续保费率
-                if (company === '国任' && isTransfer === '是' && businessType === '续保') {
-                    return { rate: '禁保', note: note };
+                // 燕赵的承保条件默认取表单当前值，便于外部直接调用时传参覆盖
+                if (underwritingCondition === undefined) {
+                    const uwEl = typeof document !== 'undefined' && document.getElementById('underwritingCondition');
+                    underwritingCondition = uwEl ? uwEl.value : '常规车型';
                 }
-                // 锦泰多一层车驾意维度
-                if (company === '锦泰') {
-                    // 安阳鹤壁货车禁保
-                    const truckTypes = ['营运货车', '非营运货车', '营运厢货 | 1吨以下', '营运厢货 | 1吨以上'];
-                    if ((city === '安阳' || city === '鹤壁') && truckTypes.includes(vehicleType)) {
-                        return { rate: '禁保', note: note };
-                    }
-                    const carAccidentKey = hasCarAccident === '是' ? '含车驾意' : '不含车驾意';
-                    // 特种车使用人员维度
-                    if (vehicleType === '特种车') {
-                        const personnelKey = hasPersonnel === '是' ? '含人员' : '不含人员';
-                        const rate = rates[company][city][vehicleType][personnelKey][insuranceType];
-                        return { rate: rate || '暂无数据', note: note };
-                    }
-                    // 新能源多一层优质车型维度
-                    if (vehicleType === '非营运客车 | 新能源') {
-                        const premiumKey = isPremiumVehicle === '是' ? '优质车型' : '非优质车型';
-                        const rate = rates[company][city][vehicleType][carAccidentKey][premiumKey][insuranceType];
-                        return { rate: rate || '暂无数据', note: note };
-                    }
-                    const rate = rates[company][city][vehicleType][carAccidentKey][insuranceType];
-                    return { rate: rate || '暂无数据', note: note };
+
+                const resolved = resolveRatePath(company, city, businessType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle, hasPersonnel, underwritingCondition);
+                if (resolved.ban) {
+                    // 规则性禁保不落在 rates 的格子上（例如国任过户续保与过户转保共用同一路径，
+                    // 但前者禁保、后者有费率），key 必须加以区分，否则一次上报会串格
+                    return {
+                        rate: resolved.ban,
+                        note: note,
+                        rateKey: resolved.path.concat(insuranceType, '规则禁保').join(' / ')
+                    };
                 }
-                // 燕赵使用承保条件维度
-                if (company === '燕赵') {
-                    const underwritingCondition = document.getElementById('underwritingCondition').value;
-                    // 特种车禁保城市
-                    const specialVehicleTypes = ['特种车 | 特二特三 | 2吨以下垃圾车', '特种车 | 清障车', '特种车 | 2吨以上垃圾车'];
-                    if (specialVehicleTypes.includes(vehicleType) && (city === '安阳' || city === '信阳' || city === '周口')) {
-                        return { rate: '禁保', note: note };
-                    }
-                    // 非营运企事业客车/救护车禁保城市
-                    if (vehicleType === '非营运企事业客车/救护车' && (city === '安阳' || city === '信阳')) {
-                        return { rate: '禁保', note: note };
-                    }
-                    // 获取费率数据
-                    let rateData;
-                    const yanzhaoCitiesWithUnderwriting = ['郑州', '焦作', '商丘', '许昌', '平顶山', '漯河', '新乡'];
-                    if (vehicleType === '非营运客车' && yanzhaoCitiesWithUnderwriting.includes(city)) {
-                        // 非营运客车在支持非常规车型的城市使用承保条件维度
-                        rateData = rates[company][city][vehicleType][underwritingCondition];
-                    } else if (vehicleType === '非营运客车') {
-                        // 非营运客车在不支持非常规车型的城市使用常规车型
-                        rateData = rates[company][city][vehicleType]['常规车型'];
-                    } else {
-                        // 其他车辆类型不使用承保条件维度，直接使用费率数据
-                        rateData = rates[company][city][vehicleType];
-                        if (rateData && rateData['常规车型']) {
-                            // 如果有常规车型维度，使用常规车型的数据
-                            rateData = rateData['常规车型'];
-                        }
-                    }
-                    if (!rateData) {
-                        return { rate: '暂无数据', note: note };
-                    }
-                    const rate = rateData[insuranceType];
-                    return { rate: rate || '暂无数据', note: note };
+
+                const rateKey = resolved.path.concat(insuranceType).join(' / ');
+                const found = readRateByPath(resolved.path, insuranceType);
+                if (found.missing) {
+                    return { rate: '暂无数据', note: note, rateKey: rateKey };
                 }
-                const rate = rates[company][city][vehicleType][effectiveType][insuranceType];
-                return { rate: rate || '暂无数据', note: note };
+                return { rate: found.rate, note: note, rateKey: rateKey };
             } catch (e) {
                 return { rate: '暂无数据', note: note };
             }

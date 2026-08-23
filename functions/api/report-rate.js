@@ -9,6 +9,7 @@ export async function onRequestPost(context) {
       vehicleType,
       businessType,
       insuranceType,
+      rateKey,
       oldRate,
       newRate,
       note
@@ -22,9 +23,9 @@ export async function onRequestPost(context) {
     }
 
     const result = await env.DB.prepare(`
-      INSERT INTO rate_reports (company, city, vehicle_type, business_type, insurance_type, old_rate, new_rate, note)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).bind(company, city, vehicleType, businessType, insuranceType, oldRate, newRate, note)
+      INSERT INTO rate_reports (company, city, vehicle_type, business_type, insurance_type, rate_key, old_rate, new_rate, note)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(company, city, vehicleType, businessType, insuranceType, rateKey || null, oldRate, newRate, note)
       .run();
 
     return new Response(JSON.stringify({

@@ -174,3 +174,8 @@
 *.lz
 *.lzma
 *.iso
+
+# Local SQLite database (contains rate report records, must not be committed)
+*.db
+*.sqlite
+*.sqlite3
