@@ -555,7 +555,7 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 15:41</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 15:48</span>
         </div>
     </nav>
 
@@ -5231,6 +5231,11 @@
                 note = '厢货可出单交；双排货车不分转续保｜单交 12 (续保 + 1)｜交商 20+21';
             } else {
                 note = '非车险费用：50元以下30%，50元以上45%';
+            }
+
+            // 华海郑州货车（豫AV）三方不一致扣减，客车不适用
+            if (company === '华海' && city === '郑州' && vehicleType.indexOf('货车') !== -1) {
+                note += '；特别注意：投保人被保险人车主三方不一致，费率扣减3%';
             }
 
             try {
