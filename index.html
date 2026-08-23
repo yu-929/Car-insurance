@@ -555,7 +555,7 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 18:41</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 19:13</span>
         </div>
     </nav>
 
@@ -5217,6 +5217,11 @@
                 } else if (vehicleType === '非营运企事业客车/救护车' && (city === '安阳' || city === '信阳')) {
                     ban = '禁保';
                 }
+            } else if (company === '恒邦') {
+                // 恒邦新能源客车仅承保非过户（40分以内非过户）
+                if (isTransfer === '是' && vehicleType === '非营运客车 | 新能源') {
+                    ban = '禁保';
+                }
             }
 
             return { path: path, ban: ban };
@@ -5375,7 +5380,7 @@
             // 恒邦备注
             if (company === '恒邦') {
                 if (vehicleType === '非营运客车 | 新能源') {
-                    note = '新能源客车(4座以下)；保车损年龄3年以下商业必须选团车编码0825002';
+                    note = '新能源客车(4座以下)，仅承保非过户；保车损年龄3年以下商业必须选团车编码0825002';
                 } else if (vehicleType === '营运货车') {
                     note = '2-9.9吨营业货车：单交承保普货/厢货，交三承保普货不承保车损；必须选团车编码2-9.9吨货TS业务';
                 } else {
