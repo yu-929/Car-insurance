@@ -555,7 +555,7 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 14:44</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 14:57</span>
         </div>
     </nav>
 
@@ -5151,8 +5151,6 @@
                     } else {
                         note = '非车费用30%';
                     }
-                } else if (vehicleType === '营运货车') {
-                    note = '非车费用30%';
                 } else {
                     if (hasCarAccident === '是') {
                         note = '非车费用30%，200元车驾意商业16%';
@@ -5221,10 +5219,9 @@
                     }
                 }
             } else if (vehicleType === '营运货车') {
+                // 过户与否对营运货车备注无影响，仅洛阳另有说明
                 if (city === '洛阳') {
                     note = '无返回以外情况及1-5档交商共保交强-5；非车险费用：380元、580元、880元，费率20%；50元以下30%，50元以上45%';
-                } else if (isTransfer === '是') {
-                    note = '非车险费用：380元、580元、880元，费率20%；50元以下30%，50元以上45%';
                 } else {
                     note = '非车险费用：380元、580元、880元，费率20%；50元以下30%，50元以上45%';
                 }
