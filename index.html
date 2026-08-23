@@ -555,7 +555,7 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 08:39</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 10:43</span>
         </div>
     </nav>
 
@@ -571,8 +571,8 @@
                 <input type="text" id="newRate" placeholder="请输入新费率" style="width:100%;padding:8px 12px;border:1px solid var(--color-border);border-radius:var(--radius-sm);font-size:14px;box-sizing:border-box;">
             </div>
             <div class="modal-section">
-                <h4>备注</h4>
-                <textarea id="reportNote" rows="3" placeholder="请输入备注信息" style="width:100%;padding:8px 12px;border:1px solid var(--color-border);border-radius:var(--radius-sm);font-size:14px;box-sizing:border-box;resize:vertical;"></textarea>
+                <h4>附加备注</h4>
+                <textarea id="reportNote" rows="3" placeholder="选填，与固定的非车备注并行展示" style="width:100%;padding:8px 12px;border:1px solid var(--color-border);border-radius:var(--radius-sm);font-size:14px;box-sizing:border-box;resize:vertical;"></textarea>
             </div>
             <div id="reportError" style="color:#ff3b30;font-size:13px;margin-top:8px;display:none;"></div>
             <div class="modal-actions">
@@ -717,6 +717,7 @@
                 <span class="rate-updated-tag" id="rateUpdatedTag" style="display:none;">已更新</span>
             </div>
             <p class="result-note" id="resultNote"></p>
+            <p class="result-note" id="resultExtraNote" style="display:none; margin-top:8px;"></p>
             <p class="result-note" id="premiumNote" style="display:none; margin-top:8px; font-size:0.9em;"></p>
         </section>
     </main>
@@ -832,8 +833,9 @@
             const currentRate = this.textContent;
             if (currentRate && currentRate !== '暂无数据') {
                 newRateInput.value = currentRate;
-                // 获取当前备注并填入（取纯备注内容，不含标签）
-                reportNote.value = document.getElementById('resultNote').dataset.note || '';
+                // 预填已有的附加备注。固定的非车备注不参与上报，
+                // 避免被用户改写后覆盖掉内置文案
+                reportNote.value = document.getElementById('resultExtraNote').dataset.note || '';
                 reportModal.classList.add('active');
             }
         });
@@ -1128,9 +1130,12 @@
                 rateKey: rateInfo.rateKey || ''
             };
 
-            // 从数据库获取已审核通过的最新费率与备注，覆盖内置数据
+            // 从数据库获取已审核通过的最新费率与附加备注
+            // 固定的非车备注由 getRateInfo 生成，不可被上报内容覆盖；
+            // 上报备注一律作为附加信息与之并行展示
             let displayRate = rateInfo.rate;
-            let displayNote = rateInfo.note;
+            const fixedNote = rateInfo.note;
+            let extraNote = '';
             let isOverridden = false;
             try {
                 const params = new URLSearchParams({
@@ -1150,7 +1155,7 @@
                     isOverridden = true;
                 }
                 if (data.note) {
-                    displayNote = data.note;
+                    extraNote = data.note;
                     isOverridden = true;
                 }
             } catch (error) {
@@ -1190,14 +1195,29 @@
             document.getElementById('resultRate').textContent = displayRate;
             const updatedTag = document.getElementById('rateUpdatedTag');
             updatedTag.style.display = isOverridden ? 'inline-block' : 'none';
+
+            // 固定的非车备注
             const resultNote = document.getElementById('resultNote');
-            resultNote.dataset.note = displayNote || '';
-            if (displayNote) {
+            resultNote.dataset.note = fixedNote || '';
+            if (fixedNote) {
                 resultNote.innerHTML = '<span class="note-label">备注信息：</span>' +
                     '<span class="note-body"></span>';
-                resultNote.querySelector('.note-body').textContent = displayNote;
+                resultNote.querySelector('.note-body').textContent = fixedNote;
             } else {
                 resultNote.textContent = '';
+            }
+
+            // 上报的附加备注，与固定备注并行展示
+            const extraNoteEl = document.getElementById('resultExtraNote');
+            extraNoteEl.dataset.note = extraNote || '';
+            if (extraNote) {
+                extraNoteEl.innerHTML = '<span class="note-label">附加备注：</span>' +
+                    '<span class="note-body"></span>';
+                extraNoteEl.querySelector('.note-body').textContent = extraNote;
+                extraNoteEl.style.display = 'block';
+            } else {
+                extraNoteEl.textContent = '';
+                extraNoteEl.style.display = 'none';
             }
 
             // 锦泰优质车型额外备注
