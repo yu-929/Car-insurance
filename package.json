@@ -7,7 +7,8 @@
     "start": "node server.js",
     "dev": "wrangler pages dev",
     "deploy": "wrangler pages deploy",
-    "db:init": "wrangler d1 execute car-insurance-db --file=schema.sql",
+    "db:init": "wrangler d1 execute car-insurance-db --remote --file=schema.sql",
+    "db:init:local": "wrangler d1 execute car-insurance-db --local --file=schema.sql",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -27,6 +28,6 @@
     "express": "^5.2.1"
   },
   "devDependencies": {
-    "wrangler": "^3.0.0"
+    "wrangler": "^4.125.0"
   }
 }
