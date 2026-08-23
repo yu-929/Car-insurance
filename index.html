@@ -555,7 +555,7 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 20:41</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 22:20</span>
         </div>
     </nav>
 
@@ -836,6 +836,9 @@
         // 而不是重新读表单——用户可能在看结果时又改了下拉但没重新查询
         let currentQueryContext = null;
 
+        // 查询序号，用于防止并发查询时慢的旧请求覆盖新的查询结果
+        let querySequence = 0;
+
         // 点击费率打开上报弹窗
         document.getElementById('resultRate').addEventListener('click', function() {
             const currentRate = this.textContent;
@@ -949,6 +952,7 @@
                 underwritingConditionField.style.display = 'none';
                 document.getElementById('isTransferField').style.display = 'block';
                 document.getElementById('businessTypeField').style.display = 'block';
+                document.getElementById('tiananScoreField').style.display = 'none';
             } else if (company === '国任') {
                 rebuildSelectOptions(citySelect, getAvailableCities(company));
                 citySelect.value = getAvailableCities(company).indexOf('郑州') >= 0 ? '郑州' : '';
@@ -961,6 +965,7 @@
                 underwritingConditionField.style.display = 'none';
                 document.getElementById('isTransferField').style.display = 'block';
                 document.getElementById('businessTypeField').style.display = 'block';
+                document.getElementById('tiananScoreField').style.display = 'none';
             } else if (company === '锦泰') {
                 rebuildSelectOptions(citySelect, getAvailableCities(company));
                 rebuildSelectOptions(vehicleTypeSelect, getAvailableVehicleTypes(company));
@@ -973,6 +978,7 @@
                 // 锦泰不区分过户和业务类型，隐藏这两个字段
                 document.getElementById('isTransferField').style.display = 'none';
                 document.getElementById('businessTypeField').style.display = 'none';
+                document.getElementById('tiananScoreField').style.display = 'none';
             } else if (company === '燕赵') {
                 rebuildSelectOptions(citySelect, getAvailableCities(company));
                 rebuildSelectOptions(vehicleTypeSelect, getAvailableVehicleTypes(company));
@@ -1139,6 +1145,7 @@
         document.getElementById('insuranceForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
+            const querySeq = ++querySequence;
             const insuranceCompany = document.getElementById('insuranceCompany').value;
             const city = document.getElementById('city').value;
             const businessType = document.getElementById('businessType').value;
@@ -1182,6 +1189,10 @@
                 }
                 const response = await fetch('/api/latest-note?' + params.toString());
                 const data = await response.json();
+                // 若期间用户又发起了新查询，丢弃本次过期响应，避免覆盖新结果
+                if (querySeq !== querySequence) {
+                    return;
+                }
                 if (data.new_rate) {
                     displayRate = data.new_rate;
                     isOverridden = true;

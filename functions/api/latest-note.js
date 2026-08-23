@@ -22,7 +22,7 @@ export async function onRequestGet(context) {
       result = await env.DB.prepare(`
         SELECT new_rate, note FROM rate_reports
         WHERE rate_key = ? AND status = 'approved'
-        ORDER BY reported_at DESC
+        ORDER BY reported_at DESC, id DESC
         LIMIT 1
       `).bind(rateKey).first();
     }
@@ -35,7 +35,7 @@ export async function onRequestGet(context) {
           AND business_type = ? AND insurance_type = ?
           AND rate_key IS NULL
           AND status = 'approved'
-        ORDER BY reported_at DESC
+        ORDER BY reported_at DESC, id DESC
         LIMIT 1
       `).bind(company, city, vehicleType, businessType, insuranceType).first();
     }
