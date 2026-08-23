@@ -555,7 +555,7 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 22:20</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-23 23:06</span>
         </div>
     </nav>
 
@@ -5562,17 +5562,20 @@
 
             // 申能备注
             if (company === '申能') {
+                // 过户统一折叠到转保档（费率取值与备注口径一致），
+                // 故业务类型按实际生效档位判断，避免「过户+续保」走转保费率却附续保专属备注
+                const effBusinessType = isTransfer === '是' ? '转保' : businessType;
                 note = '商业三者须≥200万；天马标费及天马核保评分均需在30分以上，低于30分禁保；单商业上限13，低于按实际（转保及过户）';
                 const tiananEl = typeof document !== 'undefined' && document.getElementById('tiananScore');
                 const tiananScore = tiananEl ? tiananEl.value : '30分以上';
-                if (businessType === '续保') {
+                if (effBusinessType === '续保') {
                     note += '；续保业务（含单商、交商）可续保前3天（28-30天）内加2%';
                 }
                 if (insuranceType === '单交强' && tiananScore === '30分以上') {
-                    note += '；加驾乘险（≥59元驾乘）：转保单交' + (businessType === '续保' ? '11' : '7') + '%';
+                    note += '；加驾乘险（≥59元驾乘）：转保单交' + (effBusinessType === '续保' ? '11' : '7') + '%';
                 } else if (insuranceType === '交商共保') {
                     if (tiananScore === '30-40分') {
-                        note += '；加驾乘险（≥59元驾乘）：' + (businessType === '续保' ? '13+17' : '8+14');
+                        note += '；加驾乘险（≥59元驾乘）：' + (effBusinessType === '续保' ? '13+17' : '8+14');
                     } else if (tiananScore === '40分以上') {
                         note += '；加驾乘险（≥59元驾乘）：14+20';
                     }
