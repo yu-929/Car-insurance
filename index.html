@@ -242,12 +242,62 @@
             line-height: 1.2;
             color: var(--color-text);
             white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        .company-chip:hover {
+            border-color: var(--color-primary);
+            background: var(--color-bg-subtle);
+        }
+
+        .company-chip.active {
+            border-color: var(--color-primary);
+            background: #e8f0fb;
         }
 
         .company-chip .chip-count {
             font-size: 13px;
             font-weight: 400;
             color: var(--color-text-tertiary);
+        }
+
+        .company-popover {
+            position: fixed;
+            z-index: 60;
+            max-width: 420px;
+            min-width: 220px;
+            padding: 16px 20px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            background: var(--color-bg);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--color-text);
+        }
+
+        .company-popover .popover-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--color-text);
+        }
+
+        .company-popover .popover-cities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .company-popover .popover-city {
+            padding: 2px 10px;
+            border: 1px solid var(--color-border);
+            border-radius: 999px;
+            background: var(--color-bg-subtle);
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            white-space: nowrap;
         }
 
         .main {
@@ -5673,6 +5723,7 @@
         initFormDefaults();
 
         // 首页展示已收录费率的保险公司及其覆盖城市数
+        // 点击保司标签弹出该保司可出的城市列表
         (function renderHeroCompanies() {
             const container = document.getElementById('heroCompanies');
             if (!container) return;
@@ -5689,10 +5740,31 @@
                 return;
             }
             container.innerHTML = '';
+
+            // 城市弹层
+            let popover = null;
+
+            function closePopover() {
+                if (popover) {
+                    popover.remove();
+                    popover = null;
+                }
+                Array.prototype.forEach.call(container.querySelectorAll('.company-chip'), function (ch) {
+                    ch.classList.remove('active');
+                });
+            }
+
+            document.addEventListener('click', function (e) {
+                if (popover && !popover.contains(e.target) && !e.target.closest('.company-chip')) {
+                    closePopover();
+                }
+            });
+
             available.forEach(function (name) {
                 const cityCount = Object.keys(rates[name]).length;
                 const chip = document.createElement('span');
                 chip.className = 'company-chip';
+                chip.tabIndex = 0;
                 const label = document.createElement('span');
                 label.textContent = name;
                 const count = document.createElement('span');
@@ -5700,6 +5772,50 @@
                 count.textContent = cityCount + ' 个城市';
                 chip.appendChild(label);
                 chip.appendChild(count);
+
+                chip.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    const alreadyActive = chip.classList.contains('active');
+                    closePopover();
+                    if (alreadyActive) return;
+
+                    chip.classList.add('active');
+                    // 该保司可出城市按统一顺序展示
+                    const cities = sortByDisplayOrder(Object.keys(rates[name]), cityDisplayOrder);
+                    popover = document.createElement('div');
+                    popover.className = 'company-popover';
+                    const title = document.createElement('div');
+                    title.className = 'popover-title';
+                    title.textContent = name + ' 可出 ' + cityCount + ' 个城市';
+                    const citiesBox = document.createElement('div');
+                    citiesBox.className = 'popover-cities';
+                    cities.forEach(function (ci) {
+                        const item = document.createElement('span');
+                        item.className = 'popover-city';
+                        item.textContent = ci;
+                        citiesBox.appendChild(item);
+                    });
+                    popover.appendChild(title);
+                    popover.appendChild(citiesBox);
+                    document.body.appendChild(popover);
+
+                    // 定位到 chip 下方居中
+                    const rect = chip.getBoundingClientRect();
+                    const pr = popover.getBoundingClientRect();
+                    let left = rect.left + rect.width / 2 - pr.width / 2;
+                    left = Math.max(12, Math.min(left, window.innerWidth - pr.width - 12));
+                    const top = rect.bottom + 8;
+                    popover.style.left = left + 'px';
+                    popover.style.top = top + 'px';
+                });
+
+                chip.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        chip.click();
+                    }
+                });
+
                 container.appendChild(chip);
             });
         })();
