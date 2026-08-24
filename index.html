@@ -284,6 +284,30 @@
             color: var(--color-text);
         }
 
+        .company-popover .popover-cats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .company-popover .popover-cat {
+            padding: 2px 10px;
+            border: 1px solid var(--color-border);
+            border-radius: 999px;
+            background: var(--color-bg-subtle);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            white-space: nowrap;
+        }
+
+        .company-popover .popover-cat-te {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            background: #e8f0fb;
+        }
+
         .company-popover .popover-cities {
             display: flex;
             flex-wrap: wrap;
@@ -298,6 +322,12 @@
             font-size: 13px;
             color: var(--color-text-secondary);
             white-space: nowrap;
+        }
+
+        .company-popover .popover-city-diff {
+            color: var(--color-text-tertiary);
+            font-size: 12px;
+            margin-left: 2px;
         }
 
         .main {
@@ -5724,6 +5754,23 @@
 
         // 首页展示已收录费率的保险公司及其覆盖城市数
         // 点击保司标签弹出该保司可出的城市列表
+        // 标注公司级类别徽章（仅客车/仅货车/客车+货车/含特种车），
+        // 城市级与公司整体类别不一致的差异城市单独标注。
+        // 车型类别划分：含"客车/救护车/校车"为客车类、含"货车/厢货"为货车类、含"特种"为特种车类
+        function vehicleCategory(vt) {
+            if (vt.indexOf('特种') >= 0) return 'te';
+            if (vt.indexOf('货车') >= 0 || vt.indexOf('厢货') >= 0) return 'huo';
+            return 'ker';
+        }
+
+        function summarizeCats(catSet) {
+            const parts = [];
+            if (catSet.ker) parts.push('客车');
+            if (catSet.huo) parts.push('货车');
+            if (catSet.te) parts.push('特种车');
+            return parts;
+        }
+
         (function renderHeroCompanies() {
             const container = document.getElementById('heroCompanies');
             if (!container) return;
@@ -5762,6 +5809,26 @@
 
             available.forEach(function (name) {
                 const cityCount = Object.keys(rates[name]).length;
+
+                // 公司级类别并集
+                const coCat = { ker: false, huo: false, te: false };
+                Object.keys(rates[name]).forEach(function (ci) {
+                    Object.keys(rates[name][ci]).forEach(function (vt) {
+                        coCat[vehicleCategory(vt)] = true;
+                    });
+                });
+                const coCats = summarizeCats(coCat);
+
+                // 城市级类别，用于标注差异城市
+                const cityCat = {};
+                Object.keys(rates[name]).forEach(function (ci) {
+                    const c = { ker: false, huo: false, te: false };
+                    Object.keys(rates[name][ci]).forEach(function (vt) {
+                        c[vehicleCategory(vt)] = true;
+                    });
+                    cityCat[ci] = c;
+                });
+
                 const chip = document.createElement('span');
                 chip.className = 'company-chip';
                 chip.tabIndex = 0;
@@ -5782,20 +5849,41 @@
                     chip.classList.add('active');
                     // 该保司可出城市按统一顺序展示
                     const cities = sortByDisplayOrder(Object.keys(rates[name]), cityDisplayOrder);
+                    // 有与该保司整体类别不同的城市单独标注
+                    const diffCities = cities.filter(function (ci) {
+                        const c = cityCat[ci];
+                        return c.ker !== coCat.ker || c.huo !== coCat.huo || c.te !== coCat.te;
+                    });
                     popover = document.createElement('div');
                     popover.className = 'company-popover';
                     const title = document.createElement('div');
                     title.className = 'popover-title';
                     title.textContent = name + ' 可出 ' + cityCount + ' 个城市';
+                    const catsBox = document.createElement('div');
+                    catsBox.className = 'popover-cats';
+                    coCats.forEach(function (cat) {
+                        const tag = document.createElement('span');
+                        tag.className = 'popover-cat' + (cat === '特种车' ? ' popover-cat-te' : '');
+                        tag.textContent = cat;
+                        catsBox.appendChild(tag);
+                    });
+                    popover.appendChild(title);
+                    popover.appendChild(catsBox);
                     const citiesBox = document.createElement('div');
                     citiesBox.className = 'popover-cities';
                     cities.forEach(function (ci) {
                         const item = document.createElement('span');
                         item.className = 'popover-city';
                         item.textContent = ci;
+                        if (diffCities.indexOf(ci) >= 0) {
+                            const dCat = summarizeCats(cityCat[ci]);
+                            const tip = document.createElement('span');
+                            tip.className = 'popover-city-diff';
+                            tip.textContent = '（仅' + dCat.join('+') + '）';
+                            item.appendChild(tip);
+                        }
                         citiesBox.appendChild(item);
                     });
-                    popover.appendChild(title);
                     popover.appendChild(citiesBox);
                     document.body.appendChild(popover);
 
