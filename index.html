@@ -635,7 +635,7 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-26 16:04</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-26 16:21</span>
         </div>
     </nav>
 
@@ -786,6 +786,13 @@
                             <option value="30分以上">30分以上</option>
                             <option value="30-40分">30-40分</option>
                             <option value="40分以上">40分以上</option>
+                        </select>
+                    </div>
+                    <div class="field" id="rideInsuranceField" style="display:none;">
+                        <label for="rideInsurance">驾乘险</label>
+                        <select id="rideInsurance">
+                            <option value="不加驾乘险">不加驾乘险（或低于59元驾乘）</option>
+                            <option value="加驾乘险">加驾乘险（不能低于59元）</option>
                         </select>
                     </div>
                 </div>
@@ -1090,6 +1097,7 @@
                 document.getElementById('isTransferField').style.display = 'block';
                 document.getElementById('businessTypeField').style.display = 'block';
                 document.getElementById('tiananScoreField').style.display = 'block';
+                document.getElementById('rideInsuranceField').style.display = 'block';
             } else {
                 rebuildSelectOptions(citySelect, getAvailableCities(company));
                 rebuildSelectOptions(vehicleTypeSelect, getAvailableVehicleTypes(company));
@@ -1103,6 +1111,7 @@
                 isPremiumVehicleField.style.display = 'none';
                 underwritingConditionField.style.display = 'none';
                 document.getElementById('tiananScoreField').style.display = 'none';
+                document.getElementById('rideInsuranceField').style.display = 'none';
             }
         });
 
@@ -1236,8 +1245,9 @@
             const hasPersonnel = document.getElementById('hasPersonnel').value;
             const isPremiumVehicle = document.getElementById('isPremiumVehicle').value;
             const underwritingCondition = document.getElementById('underwritingCondition').value;
+            const rideInsurance = document.getElementById('rideInsurance').value;
 
-            const rateInfo = getRateInfo(insuranceCompany, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle, hasPersonnel, underwritingCondition);
+            const rateInfo = getRateInfo(insuranceCompany, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle, hasPersonnel, underwritingCondition, rideInsurance);
 
             // 记录本次查询，供上报时精确绑定到同一格费率
             currentQueryContext = {
@@ -5419,26 +5429,54 @@
                 '郑州': {
                     '非营运客车': {
                         '转保': {
-                            '30分以上': { '单交强': '4%', '单商业': '13%', '交商共保': '暂无数据' },
-                            '30-40分': { '单交强': '暂无数据', '单商业': '10%', '交商共保': '8%+10%' },
-                            '40分以上': { '单交强': '暂无数据', '单商业': '13%', '交商共保': '14%+16%' }
+                            '不加驾乘险': {
+                                '30分以上': { '单交强': '4%', '单商业': '禁保', '交商共保': '暂无数据' },
+                                '30-40分': { '单交强': '暂无数据', '单商业': '10%', '交商共保': '8%+10%' },
+                                '40分以上': { '单交强': '暂无数据', '单商业': '13%', '交商共保': '14%+16%' }
+                            },
+                            '加驾乘险': {
+                                '30分以上': { '单交强': '7%', '单商业': '禁保', '交商共保': '暂无数据' },
+                                '30-40分': { '单交强': '暂无数据', '单商业': '14%', '交商共保': '8%+14%' },
+                                '40分以上': { '单交强': '暂无数据', '单商业': '20%', '交商共保': '14%+20%' }
+                            }
                         },
                         '续保': {
-                            '30分以上': { '单交强': '6%', '单商业': '13%', '交商共保': '暂无数据' },
-                            '30-40分': { '单交强': '暂无数据', '单商业': '13%', '交商共保': '13%+13%' },
-                            '40分以上': { '单交强': '暂无数据', '单商业': '16%', '交商共保': '14%+16%' }
+                            '不加驾乘险': {
+                                '30分以上': { '单交强': '6%', '单商业': '禁保', '交商共保': '暂无数据' },
+                                '30-40分': { '单交强': '暂无数据', '单商业': '13%', '交商共保': '13%+13%' },
+                                '40分以上': { '单交强': '暂无数据', '单商业': '16%', '交商共保': '14%+16%' }
+                            },
+                            '加驾乘险': {
+                                '30分以上': { '单交强': '11%', '单商业': '禁保', '交商共保': '暂无数据' },
+                                '30-40分': { '单交强': '暂无数据', '单商业': '17%', '交商共保': '13%+17%' },
+                                '40分以上': { '单交强': '暂无数据', '单商业': '20%', '交商共保': '14%+20%' }
+                            }
                         }
                     },
                     '非营运客车 | 新能源': {
                         '转保': {
-                            '30分以上': { '单交强': '4%', '单商业': '13%', '交商共保': '暂无数据' },
-                            '30-40分': { '单交强': '暂无数据', '单商业': '10%', '交商共保': '8%+10%' },
-                            '40分以上': { '单交强': '暂无数据', '单商业': '13%', '交商共保': '14%+16%' }
+                            '不加驾乘险': {
+                                '30分以上': { '单交强': '4%', '单商业': '禁保', '交商共保': '暂无数据' },
+                                '30-40分': { '单交强': '暂无数据', '单商业': '10%', '交商共保': '8%+10%' },
+                                '40分以上': { '单交强': '暂无数据', '单商业': '13%', '交商共保': '14%+16%' }
+                            },
+                            '加驾乘险': {
+                                '30分以上': { '单交强': '7%', '单商业': '禁保', '交商共保': '暂无数据' },
+                                '30-40分': { '单交强': '暂无数据', '单商业': '14%', '交商共保': '8%+14%' },
+                                '40分以上': { '单交强': '暂无数据', '单商业': '20%', '交商共保': '14%+20%' }
+                            }
                         },
                         '续保': {
-                            '30分以上': { '单交强': '6%', '单商业': '13%', '交商共保': '暂无数据' },
-                            '30-40分': { '单交强': '暂无数据', '单商业': '13%', '交商共保': '13%+13%' },
-                            '40分以上': { '单交强': '暂无数据', '单商业': '16%', '交商共保': '14%+16%' }
+                            '不加驾乘险': {
+                                '30分以上': { '单交强': '6%', '单商业': '禁保', '交商共保': '暂无数据' },
+                                '30-40分': { '单交强': '暂无数据', '单商业': '13%', '交商共保': '13%+13%' },
+                                '40分以上': { '单交强': '暂无数据', '单商业': '16%', '交商共保': '14%+16%' }
+                            },
+                            '加驾乘险': {
+                                '30分以上': { '单交强': '11%', '单商业': '禁保', '交商共保': '暂无数据' },
+                                '30-40分': { '单交强': '暂无数据', '单商业': '17%', '交商共保': '13%+17%' },
+                                '40分以上': { '单交强': '暂无数据', '单商业': '20%', '交商共保': '14%+20%' }
+                            }
                         }
                     }
                 }
@@ -5457,7 +5495,7 @@
 
         const YANZHAO_UNDERWRITING_CITIES = ['郑州', '焦作', '商丘', '许昌', '平顶山', '漯河', '新乡'];
 
-        function resolveRatePath(company, city, businessType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle, hasPersonnel, underwritingCondition) {
+        function resolveRatePath(company, city, businessType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle, hasPersonnel, underwritingCondition, rideInsurance) {
             let path;
 
             if (company === '锦泰') {
@@ -5488,7 +5526,9 @@
                 // 申能：仅郑州；过户按转保档走；费率按天安标费档位分层（30分以下禁保不在此列）
                 const tiananEl = typeof document !== 'undefined' && document.getElementById('tiananScore');
                 const tiananScore = tiananEl ? tiananEl.value : '30分以上';
-                path = [company, city, vehicleType, isTransfer === '是' ? '转保' : businessType, tiananScore || '30分以上'];
+                const rideInsuranceEl = typeof document !== 'undefined' && document.getElementById('rideInsurance');
+                const rideInsurance = rideInsuranceEl ? rideInsuranceEl.value : '不加驾乘险';
+                path = [company, city, vehicleType, isTransfer === '是' ? '转保' : businessType, rideInsurance, tiananScore || '30分以上'];
             } else {
                 path = [company, city, vehicleType, isTransfer === '是' ? '过户' : businessType];
             }
@@ -5535,7 +5575,7 @@
             return { rate: node };
         }
 
-        function getRateInfo(company, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle, hasPersonnel, underwritingCondition) {
+        function getRateInfo(company, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle, hasPersonnel, underwritingCondition, rideInsurance) {
 
             let note = '';
             if (company === '国任') {
@@ -5725,7 +5765,7 @@
                     underwritingCondition = uwEl ? uwEl.value : '常规车型';
                 }
 
-                const resolved = resolveRatePath(company, city, businessType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle, hasPersonnel, underwritingCondition);
+                const resolved = resolveRatePath(company, city, businessType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle, hasPersonnel, underwritingCondition, rideInsurance);
                 if (resolved.ban) {
                     // 规则性禁保不落在 rates 的格子上（例如国任过户续保与过户转保共用同一路径，
                     // 但前者禁保、后者有费率），key 必须加以区分，否则一次上报会串格
