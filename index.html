@@ -635,7 +635,7 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-26 16:39</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-26 17:16</span>
         </div>
     </nav>
 
@@ -1053,8 +1053,12 @@
             } else if (company === '锦泰') {
                 rebuildSelectOptions(citySelect, getAvailableCities(company));
                 rebuildSelectOptions(vehicleTypeSelect, getAvailableVehicleTypes(company));
-                citySelect.value = '';
-                vehicleTypeSelect.value = '';
+                // 设置默认城市为第一个可用城市
+                const jintaiCities = getAvailableCities(company);
+                citySelect.value = jintaiCities.length > 0 ? jintaiCities[0] : '';
+                // 设置默认车型为第一个可用车型
+                const jintaiVehicles = getAvailableVehicleTypes(company, citySelect.value);
+                vehicleTypeSelect.value = jintaiVehicles.length > 0 ? jintaiVehicles[0] : '';
                 hasCarAccidentField.style.display = 'block';
                 hasPersonnelField.style.display = 'none';
                 isPremiumVehicleField.style.display = 'none';
