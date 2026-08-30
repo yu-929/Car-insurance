@@ -635,7 +635,7 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-27 08:58</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-30 12:44</span>
         </div>
     </nav>
 
@@ -914,6 +914,15 @@
         const reportError = document.getElementById('reportError');
         const reportCancel = document.getElementById('reportCancel');
         const reportSubmit = document.getElementById('reportSubmit');
+
+        // 关闭上报弹窗并重置表单（取消/提交成功/点击遮罩三处共用）
+        function closeReportModal() {
+            reportModal.classList.remove('active');
+            reportPassword.value = '';
+            newRateInput.value = '';
+            reportNote.value = '';
+            reportError.style.display = 'none';
+        }
         const REPORT_PASSWORD = '0929';
 
         // 当前结果区展示的那一次查询。上报必须绑定这次查询，
@@ -936,11 +945,7 @@
         });
 
         reportCancel.addEventListener('click', function() {
-            reportModal.classList.remove('active');
-            reportPassword.value = '';
-            newRateInput.value = '';
-            reportNote.value = '';
-            reportError.style.display = 'none';
+            closeReportModal();
         });
 
         reportSubmit.addEventListener('click', async function() {
@@ -992,11 +997,7 @@
 
                 if (result.success) {
                     alert('费率上报成功！');
-                    reportModal.classList.remove('active');
-                    reportPassword.value = '';
-                    newRateInput.value = '';
-                    reportNote.value = '';
-                    reportError.style.display = 'none';
+                    closeReportModal();
                 } else {
                     reportError.textContent = result.error || '上报失败，请重试';
                     reportError.style.display = 'block';
@@ -1009,11 +1010,7 @@
 
         reportModal.addEventListener('click', function(e) {
             if (e.target === reportModal) {
-                reportModal.classList.remove('active');
-                reportPassword.value = '';
-                newRateInput.value = '';
-                reportNote.value = '';
-                reportError.style.display = 'none';
+                closeReportModal();
             }
         });
 
