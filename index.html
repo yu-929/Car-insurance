@@ -530,6 +530,11 @@
             color: var(--color-text-tertiary);
         }
 
+        /* 禁保结果红色警示，与正常费率区分 */
+        .result-highlight .rate.rate-ban {
+            color: #e74c3c;
+        }
+
         .rate-updated-tag {
             display: inline-block;
             margin-top: 8px;
@@ -635,7 +640,7 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-30 12:44</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-30 12:49</span>
         </div>
     </nav>
 
@@ -1330,7 +1335,10 @@
                 })
                 .join('');
 
-            document.getElementById('resultRate').textContent = displayRate;
+            const rateEl = document.getElementById('resultRate');
+            rateEl.textContent = displayRate;
+            // 禁保结果加红色警示样式，与正常费率区分
+            rateEl.classList.toggle('rate-ban', displayRate === '禁保');
             const updatedTag = document.getElementById('rateUpdatedTag');
             updatedTag.style.display = isOverridden ? 'inline-block' : 'none';
 
