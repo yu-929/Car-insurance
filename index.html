@@ -640,7 +640,7 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-30 12:49</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-08-30 12:55</span>
         </div>
     </nav>
 
@@ -851,8 +851,19 @@
         // 用户看不到「禁保」这个明确结论，只会以为漏录了。
         // ============================================================
 
+        // 排序索引缓存：cityDisplayOrder/vehicleTypeDisplayOrder 均为 const，
+        // 以数组引用为 key 缓存 Map，避免每次排序重复构建
+        const _orderRankCache = new Map();
+
+        function getOrderRank(order) {
+            if (!_orderRankCache.has(order)) {
+                _orderRankCache.set(order, new Map(order.map(function (v, i) { return [v, i]; })));
+            }
+            return _orderRankCache.get(order);
+        }
+
         function sortByDisplayOrder(list, order) {
-            const rank = new Map(order.map(function (v, i) { return [v, i]; }));
+            const rank = getOrderRank(order);
             return list.slice().sort(function (a, b) {
                 const ra = rank.has(a) ? rank.get(a) : Number.MAX_SAFE_INTEGER;
                 const rb = rank.has(b) ? rank.get(b) : Number.MAX_SAFE_INTEGER;
