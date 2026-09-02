@@ -1440,6 +1440,9 @@
                 const rideInsuranceEl = typeof document !== 'undefined' && document.getElementById('rideInsurance');
                 const rideInsurance = rideInsuranceEl ? rideInsuranceEl.value : '不加驾乘险';
                 path = [company, city, vehicleType, isTransfer === '是' ? '转保' : businessType, rideInsurance, tiananScore || '30分以上'];
+            } else if (company === '紫金') {
+                // 紫金不区分过户，过户按转保档走
+                path = [company, city, vehicleType, isTransfer === '是' ? '转保' : businessType];
             } else {
                 path = [company, city, vehicleType, isTransfer === '是' ? '过户' : businessType];
             }
