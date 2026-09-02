@@ -640,7 +640,7 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-09-01 15:45</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-09-02 15:31</span>
         </div>
     </nav>
 
@@ -687,6 +687,7 @@
                             <option value="锦泰">锦泰</option>
                             <option value="利宝">利宝</option>
                             <option value="申能">申能</option>
+                            <option value="紫金">紫金</option>
                             <option value="恒邦">恒邦</option>
                             <option value="国任">国任</option>
                         </select>
@@ -1666,6 +1667,8 @@
                     }
                 }
                 note += '；驾乘费用：219元驾乘25%，139元驾乘20%';
+            } else if (company === '紫金') {
+                note = '驾乘费率30%，自主定价系数0.8，新车自主定价系数0.95，单交加100驾乘，交商不低于280驾乘';
             }
 
             try {
