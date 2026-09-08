@@ -640,7 +640,7 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-09-07 18:00</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-09-08 08:00</span>
         </div>
     </nav>
 
@@ -827,7 +827,7 @@
         <p>© 2026 小钱Car-insurance查询</p>
     </footer>
 
-    <script src="rates.js?v=20260907"></script>
+    <script src="rates.js?v=20260908"></script>
     <script>
         // 城市与车型的展示顺序。
         // 仅用于排序，不决定可选性；可选性一律由 rates 数据动态推导。
@@ -1187,7 +1187,7 @@
             const city = document.getElementById('city').value;
             const vehicleType = document.getElementById('vehicleType').value;
             const businessType = document.getElementById('businessType').value;
-            const yanzhaoCitiesWithUnderwriting = ['郑州', '焦作', '商丘', '许昌', '平顶山', '漯河', '新乡'];
+            const yanzhaoCitiesWithUnderwriting = ['郑州', '焦作', '商丘', '许昌', '平顶山', '漯河', '新乡', '驻马店'];
             const shouldShow = vehicleType === '非营运客车' && yanzhaoCitiesWithUnderwriting.includes(city);
 
             if (shouldShow) {
@@ -1404,7 +1404,7 @@
         // 保证一条上报只影响它真正对应的那一格。
         // ============================================================
 
-        const YANZHAO_UNDERWRITING_CITIES = ['郑州', '焦作', '商丘', '许昌', '平顶山', '漯河', '新乡'];
+        const YANZHAO_UNDERWRITING_CITIES = ['郑州', '焦作', '商丘', '许昌', '平顶山', '漯河', '新乡', '驻马店'];
 
         function resolveRatePath(company, city, businessType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle, hasPersonnel, underwritingCondition, rideInsurance) {
             let path;
@@ -1550,7 +1550,7 @@
                 if (businessType === '续保') {
                     note += '；续保业务：可保车型商业险连续承保期间出险次数≤1次，费用同常规业务一致，≥1次的，0费用结算';
                 }
-                if (city === '开封' && vehicleType === '非营运客车') {
+                if ((city === '开封' || city === '驻马店') && vehicleType === '非营运客车') {
                     note += '；交商禁保车损';
                 }
                 if (vehicleType === '营运厢货 | 1吨以下') {
