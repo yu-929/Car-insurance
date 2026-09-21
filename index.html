@@ -50,6 +50,7 @@
             /* 提示 · 备注强调色与错误提示色 */
             --color-note: #d70015;
             --color-error: #dc1c1c;
+            --color-tint-red: #fceceb;
 
             /* 字体 · 规格：Display 与 Text 双栈 */
             --font-display: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display',
@@ -98,6 +99,7 @@
 
             --color-note: #ff6b6b;
             --color-error: #ff453a;
+            --color-tint-red: rgba(255, 69, 58, 0.16);
             --shadow-product: rgba(0, 0, 0, 0.6) 3px 5px 30px 0;
 
             --color-nav-bg: rgba(29, 29, 31, 0.8);
@@ -622,7 +624,7 @@
             transition: color 0.2s;
         }
 
-        .result-highlight .rate:hover {
+        .result-highlight .rate:not(.rate-ban):hover {
             color: var(--color-primary);
         }
 
@@ -633,9 +635,29 @@
             color: var(--color-text-tertiary);
         }
 
-        /* 禁保结果红色警示，与正常费率区分 */
+        /* 禁保整格标红并加底块，与正常费率形成明确区分 */
         .result-highlight .rate.rate-ban {
-            color: #e74c3c;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 18px;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.003em;
+            line-height: 1.1;
+            color: var(--color-note);
+            background: var(--color-tint-red);
+            border: 1px solid var(--color-note);
+            border-radius: var(--radius-md);
+        }
+
+        .result-highlight .rate.rate-ban::before {
+            content: '';
+            flex: 0 0 auto;
+            width: 9px;
+            height: 9px;
+            border-radius: var(--radius-pill);
+            background: var(--color-note);
         }
 
         .rate-updated-tag {
@@ -650,18 +672,55 @@
             border-radius: 4px;
         }
 
+        /* 备注正文用次级色，只有真正约束（禁保 / 扣减 / 禁保车损 / 出险门槛）单独标红 */
         .result-note {
             margin-top: 16px;
             font-size: 14px;
-            line-height: 1.43;
-            color: var(--color-note);
-            font-weight: 700;
-            letter-spacing: -0.224px;
+            line-height: 1.5;
+            color: var(--color-text-secondary);
+            font-weight: 400;
+            letter-spacing: -0.01em;
         }
 
         .result-note .note-label {
-            color: var(--color-text-secondary);
+            color: var(--color-text-tertiary);
             font-weight: 400;
+        }
+
+        .note-list {
+            list-style: none;
+            margin: 8px 0 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .note-list li {
+            margin: 0;
+            position: relative;
+            padding-left: 16px;
+        }
+
+        .note-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.6em;
+            width: 5px;
+            height: 5px;
+            border-radius: var(--radius-pill);
+            background: var(--color-border);
+        }
+
+        .note-list li.note-warning {
+            color: var(--color-note);
+            font-weight: 700;
+            letter-spacing: -0.022px;
+        }
+
+        .note-list li.note-warning::before {
+            background: var(--color-note);
         }
 
         .footer {
@@ -759,7 +818,7 @@
                     <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
                 </svg>
             </button>
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-09-21 22:53</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-09-21 23:24</span>
         </div>
     </nav>
 
@@ -936,9 +995,9 @@
                 <div class="rate" id="resultRate"></div>
                 <span class="rate-updated-tag" id="rateUpdatedTag" style="display:none;">已更新</span>
             </div>
-            <p class="result-note" id="resultNote"></p>
-            <p class="result-note" id="resultExtraNote" style="display:none; margin-top:8px;"></p>
-            <p class="result-note" id="premiumNote" style="display:none; margin-top:8px; font-size:0.9em;"></p>
+            <div class="result-note" id="resultNote"></div>
+            <div class="result-note" id="resultExtraNote" style="display:none; margin-top:8px;"></div>
+            <div class="result-note" id="premiumNote" style="display:none; margin-top:8px; font-size:0.9em;"></div>
         </section>
     </main>
 
@@ -946,7 +1005,7 @@
         <p>© 2026 小钱Car-insurance查询</p>
     </footer>
 
-    <script src="rates.js?v=20260921-6"></script>
+    <script src="rates.js?v=20260921-7"></script>
     <script>
         // 明亮 / 暗黑模式切换；主题已在 <head> 内提前应用，这里只负责绑定交互与持久化
         (function () {
@@ -1512,6 +1571,31 @@
                 })
                 .join('');
 
+            // 备注按「；」拆条展示；命中硬约束关键词的条目单独标红，其余走次级色
+            const NOTE_WARNING_PATTERN = /禁保|特别注意|费率扣减|出险|死亡|不予承保/;
+            const html = function (text) {
+                return String(text)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+            };
+
+            const renderNoteList = function (el, note, label) {
+                el.dataset.note = note || '';
+                if (!note) {
+                    el.innerHTML = '';
+                    return;
+                }
+                const itemsNote = note.split(/[；;]/).map(function (s) {
+                    return s.trim();
+                }).filter(Boolean);
+                const list = '<ul class="note-list">' + itemsNote.map(function (s) {
+                    const cls = NOTE_WARNING_PATTERN.test(s) ? ' class="note-warning"' : '';
+                    return '<li' + cls + '>' + html(s) + '</li>';
+                }).join('') + '</ul>';
+                el.innerHTML = '<span class="note-label">' + html(label) + '</span>' + list;
+            };
+
             const rateEl = document.getElementById('resultRate');
             rateEl.textContent = displayRate;
             // 禁保结果加红色警示样式，与正常费率区分
@@ -1520,28 +1604,12 @@
             updatedTag.style.display = isOverridden ? 'inline-block' : 'none';
 
             // 固定的非车备注
-            const resultNote = document.getElementById('resultNote');
-            resultNote.dataset.note = fixedNote || '';
-            if (fixedNote) {
-                resultNote.innerHTML = '<span class="note-label">备注信息：</span>' +
-                    '<span class="note-body"></span>';
-                resultNote.querySelector('.note-body').textContent = fixedNote;
-            } else {
-                resultNote.textContent = '';
-            }
+            renderNoteList(document.getElementById('resultNote'), fixedNote, '备注信息：');
 
             // 上报的附加备注，与固定备注并行展示
             const extraNoteEl = document.getElementById('resultExtraNote');
-            extraNoteEl.dataset.note = extraNote || '';
-            if (extraNote) {
-                extraNoteEl.innerHTML = '<span class="note-label">附加备注：</span>' +
-                    '<span class="note-body"></span>';
-                extraNoteEl.querySelector('.note-body').textContent = extraNote;
-                extraNoteEl.style.display = 'block';
-            } else {
-                extraNoteEl.textContent = '';
-                extraNoteEl.style.display = 'none';
-            }
+            renderNoteList(extraNoteEl, extraNote, '附加备注：');
+            extraNoteEl.style.display = extraNote ? 'block' : 'none';
 
             // 锦泰优质车型额外备注
             const premiumNote = document.getElementById('premiumNote');
