@@ -4,6 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>小钱Car-insurance查询</title>
+    <script>
+        // 首屏绘制前应用主题，避免闪白；无存储值时跟随系统偏好
+        (function () {
+            try {
+                var stored = localStorage.getItem('theme');
+                if (stored === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    return;
+                }
+                if (stored === null && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
     <style>
         :root {
             /* 文字 · 规格：ink / body-on-dark / body-muted / ink-muted */
@@ -29,9 +44,12 @@
             --color-primary: #0066cc;
             --color-primary-focus: #0071e3;
             --color-primary-on-dark: #2997ff;
+            /* 实底主按钮用色，白字对比度需达 AA 4.5:1 */
+            --color-primary-cta: #0066cc;
 
-            /* 提示 · 备注强调色 */
+            /* 提示 · 备注强调色与错误提示色 */
             --color-note: #d70015;
+            --color-error: #dc1c1c;
 
             /* 字体 · 规格：Display 与 Text 双栈 */
             --font-display: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display',
@@ -47,6 +65,46 @@
 
             /* 阴影 · 全系统唯一一条，仅费率结果卡使用 */
             --shadow-product: rgba(0, 0, 0, 0.22) 3px 5px 30px 0;
+
+            /* 导航栏、淡色底纹与弹层投影，随主题切换 */
+            --color-nav-bg: rgba(255, 255, 255, 0.8);
+            --color-tint-blue: rgba(0, 102, 204, 0.1);
+            --color-tint-blue-strong: #e8f0fb;
+            --color-divider-medium: rgba(0, 0, 0, 0.06);
+            --color-shadow-popover: rgba(0, 0, 0, 0.14);
+        }
+
+        /* 暗黑模式：仅覆盖颜色，尺寸与布局保持不变 */
+        [data-theme="dark"] {
+            --color-text: #f5f5f7;
+            --color-text-on-dark: #ffffff;
+            --color-text-muted-on-dark: #ffffff;
+            --color-text-secondary: #a1a1a6;
+            --color-text-tertiary: #86868b;
+
+            --color-bg: #000000;
+            --color-bg-subtle: #1d1d1f;
+            --color-surface-pearl: #161617;
+            --color-surface-black: #ffffff;
+
+            --color-border: #5a5a5e;
+            --color-hairline-soft: rgba(255, 255, 255, 0.14);
+            --color-divider-soft: rgba(255, 255, 255, 0.08);
+
+            --color-primary: #2997ff;
+            --color-primary-focus: #0a84ff;
+            --color-primary-on-dark: #64b5ff;
+            --color-primary-cta: #0071e3;
+
+            --color-note: #ff6b6b;
+            --color-error: #ff453a;
+            --shadow-product: rgba(0, 0, 0, 0.6) 3px 5px 30px 0;
+
+            --color-nav-bg: rgba(29, 29, 31, 0.8);
+            --color-tint-blue: rgba(41, 151, 255, 0.18);
+            --color-tint-blue-strong: rgba(41, 151, 255, 0.18);
+            --color-divider-medium: rgba(255, 255, 255, 0.1);
+            --color-shadow-popover: rgba(0, 0, 0, 0.6);
         }
 
         * {
@@ -70,8 +128,8 @@
 
         .nav {
             height: 48px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid var(--color-hairline-soft);
+            background: var(--color-nav-bg);
             backdrop-filter: saturate(180%) blur(20px);
             -webkit-backdrop-filter: saturate(180%) blur(20px);
             position: sticky;
@@ -97,6 +155,51 @@
             color: var(--color-text-tertiary);
             letter-spacing: -0.12px;
             white-space: nowrap;
+        }
+
+        .theme-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-pill);
+            background: transparent;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s, color 0.15s;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            background: var(--color-tint-blue);
+        }
+
+        .theme-toggle:focus-visible {
+            outline: 3px solid var(--color-primary-focus);
+            outline-offset: 2px;
+        }
+
+        .theme-toggle svg {
+            width: 16px;
+            height: 16px;
+            display: block;
+        }
+
+        .theme-toggle .icon-sun {
+            display: none;
+        }
+
+        [data-theme="dark"] .theme-toggle .icon-sun {
+            display: block;
+        }
+
+        [data-theme="dark"] .theme-toggle .icon-moon {
+            display: none;
         }
 
         .modal-overlay {
@@ -189,7 +292,7 @@
         }
 
         .modal-btn-primary {
-            background: var(--color-primary);
+            background: var(--color-primary-cta);
             color: white;
         }
 
@@ -254,7 +357,7 @@
 
         .company-chip.active {
             border-color: var(--color-primary);
-            background: #e8f0fb;
+            background: var(--color-tint-blue-strong);
         }
 
         .company-chip .chip-count {
@@ -272,7 +375,7 @@
             border: 1px solid var(--color-border);
             border-radius: var(--radius-lg);
             background: var(--color-bg);
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+            box-shadow: 0 12px 32px var(--color-shadow-popover);
             font-size: 14px;
             line-height: 1.6;
             color: var(--color-text);
@@ -305,7 +408,7 @@
         .company-popover .popover-cat-te {
             border-color: var(--color-primary);
             color: var(--color-primary);
-            background: #e8f0fb;
+            background: var(--color-tint-blue-strong);
         }
 
         .company-popover .popover-cities {
@@ -419,7 +522,7 @@
             font-weight: 400;
             letter-spacing: -0.022em;
             color: var(--color-text-on-dark);
-            background: var(--color-primary);
+            background: var(--color-primary-cta);
             border: none;
             border-radius: var(--radius-pill);
             cursor: pointer;
@@ -475,7 +578,7 @@
             justify-content: space-between;
             gap: 20px;
             padding: 14px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            border-bottom: 1px solid var(--color-divider-medium);
         }
 
         .result-item:last-child {
@@ -543,7 +646,7 @@
             font-weight: 500;
             line-height: 1.5;
             color: var(--color-primary);
-            background: rgba(0, 102, 204, 0.1);
+            background: var(--color-tint-blue);
             border-radius: 4px;
         }
 
@@ -640,7 +743,23 @@
 <body>
     <nav class="nav">
         <div class="nav-inner">
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-09-21 22:27</span>
+            <button class="theme-toggle" id="themeToggle" type="button" aria-label="切换明亮模式与暗黑模式" title="切换明亮模式 / 暗黑模式">
+                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
+                </svg>
+                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/>
+                    <line x1="21" y1="12" x2="23" y2="12"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+            </button>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-09-21 22:53</span>
         </div>
     </nav>
 
@@ -659,7 +778,7 @@
                 <h4>附加备注</h4>
                 <textarea id="reportNote" rows="3" placeholder="选填，与固定的非车备注并行展示" style="width:100%;padding:8px 12px;border:1px solid var(--color-border);border-radius:var(--radius-sm);font-size:14px;box-sizing:border-box;resize:vertical;"></textarea>
             </div>
-            <div id="reportError" style="color:#ff3b30;font-size:13px;margin-top:8px;display:none;"></div>
+            <div id="reportError" style="color:var(--color-error);font-size:13px;margin-top:8px;display:none;"></div>
             <div class="modal-actions">
                 <button class="modal-btn modal-btn-secondary" id="reportCancel">取消</button>
                 <button class="modal-btn modal-btn-primary" id="reportSubmit">提交</button>
@@ -827,8 +946,49 @@
         <p>© 2026 小钱Car-insurance查询</p>
     </footer>
 
-    <script src="rates.js?v=20260921-5"></script>
+    <script src="rates.js?v=20260921-6"></script>
     <script>
+        // 明亮 / 暗黑模式切换；主题已在 <head> 内提前应用，这里只负责绑定交互与持久化
+        (function () {
+            const root = document.documentElement;
+            const btn = document.getElementById('themeToggle');
+
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    root.setAttribute('data-theme', 'dark');
+                } else {
+                    root.removeAttribute('data-theme');
+                }
+                btn.setAttribute('aria-pressed', String(theme === 'dark'));
+                try {
+                    localStorage.setItem('theme', theme);
+                } catch (e) {}
+            }
+
+            const stored = (() => {
+                try { return localStorage.getItem('theme'); } catch (e) { return null; }
+            })();
+            const current = stored || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            btn.setAttribute('aria-pressed', String(current === 'dark'));
+
+            btn.addEventListener('click', function () {
+                applyTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+            });
+
+            // 用户在系统层面切换深浅色、且本地未做过选择时，跟随系统
+            if (!window.matchMedia) { return; }
+            try {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+                    try {
+                        if (localStorage.getItem('theme') !== null) { return; }
+                        if (e.matches) { root.setAttribute('data-theme', 'dark'); }
+                        else { root.removeAttribute('data-theme'); }
+                        btn.setAttribute('aria-pressed', String(e.matches));
+                    } catch (err) {}
+                });
+            } catch (e) {}
+        })();
+
         // 城市与车型的展示顺序。
         // 仅用于排序，不决定可选性；可选性一律由 rates 数据动态推导。
         // 新增城市/车型时若忘记加进这里，仍会出现在下拉末尾，不会丢失。
