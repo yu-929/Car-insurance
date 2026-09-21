@@ -33,13 +33,18 @@ User instruction entries should follow this format:
   - 数据组织与展示时应把「固定的非车备注」与「额外的附加备注」分开维护。
 
 [费率逻辑改动的回归验证方法]
-- Date: 2026-08-23
-- Context: Agent 在重构 getRateInfo 取值逻辑、接入费率上报 rateKey 时发现
-- Category: Testing Methods|Troubleshooting & Debugging
+- Date: 2026-09-21
+- Context: Agent 在核验燕赵费率改动时重新验证（原记录日期 2026-08-23）
+- Category: Testing Methods|Troubleshooting & Debugging|Environment Configuration
 - Instructions:
   - 凡改动 index.html 中费率取值或备注生成逻辑，必须先跑全量快照比对再提交。
-  - 快照脚本 /tmp/opencode/snapshot_rates.js：用 jsdom 加载 index.html，穷举保司×城市×车型×业务类型×险种×过户×车驾意×优质车型×人员×承保条件（约 7.9 万组合），把 rate 与 note 写成文件，改动前后 diff 必须为 0 行。
-  - jsdom 需从全局路径引入：require('/usr/local/lib/node_modules/jsdom')。
+  - jsdom 在新会话中未预装，需先 `npm install -g jsdom`，再从全局路径引入：require('/usr/local/lib/node_modules/jsdom')。
+  - 回归脚本集中在 /tmp/opencode/，但该目录内容不跨会话保留；verify_revert、verify_override、verify_jintai_note、bug_consistency、verify_ratekey_e2e 等脚本需要时按下方要点重写。verify_instype.js 已失效（其断言的 updateInsuranceTypeOptions 在下拉重构中删除）。
+  - 加载 index.html 时 url 必须用 'file:///workspace/index.html'，否则外部脚本 rates.js 无法加载，rates 为空、费率全部返回「暂无数据」。
   - jsdom 环境缺少 scrollIntoView，加载后须打桩：w.Element.prototype.scrollIntoView = function () {}。
-  - 回归脚本集中在 /tmp/opencode/，常用 verify_revert、verify_override、verify_jintai_note、bug_consistency、verify_ratekey_e2e。verify_instype.js 已失效（其断言的 updateInsuranceTypeOptions 在下拉重构中删除）。
+  - rates 是脚本作用域的 const，不挂在 window 上，w.rates 为 undefined；需用 w.eval('...') 在页面上下文内取值。
+  - getRateInfo(company, city, businessType, insuranceType, vehicleType, isTransfer, hasCarAccident, isPremiumVehicle, hasPersonnel, underwritingCondition, rideInsurance) 的 insuranceType 必须传单险种名（'单交强'/'单商业'/'交商共保'），传 'all' 会返回「暂无数据」；返回值是 { rate, note, rateKey }，rate 为单个字符串。
+  - 核验燕赵费率时承保条件必须显式传入 '常规车型'/'非常规车型' 两次，两个层都要覆盖。
+  - 改完一个城市的费率后，必须同时打印其余城市同车型的值做对照，确认未误伤（燕赵各城费率高度雷同，盲替换极易串格）。
+  - 替换燕赵数据块时用正则定位「车型键 + 常规车型子块 + 非常规车型子块」整体并断言旧值出现次数为 2，比按行文本替换安全。
   - 本地后端用 background terminal 跑 `node server.js`（端口 3001），接口联调完成后须把测试上报记录状态改为 rejected，避免污染查询结果。
