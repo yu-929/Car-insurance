@@ -818,7 +818,7 @@
                     <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
                 </svg>
             </button>
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-09-24 13:14</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-09-24 13:56</span>
         </div>
     </nav>
 
@@ -1005,7 +1005,7 @@
         <p>© 2026 小钱Car-insurance查询</p>
     </footer>
 
-    <script src="rates.js?v=20260924-1"></script>
+    <script src="rates.js?v=20260924-2"></script>
     <script>
         // 明亮 / 暗黑模式切换；主题已在 <head> 内提前应用，这里只负责绑定交互与持久化
         (function () {
@@ -1725,13 +1725,12 @@
 
             let note = '';
             if (company === '国任') {
-                const underwriting = '（最新客户画像规则）禁止承保：燃料类型非燃油｜含损新车购置价大于80万｜交强及商业险连续出险次数大于3次｜被保险人年龄小于25岁｜首年过户二手车含损类业务｜三者险三责小于100万｜两率和超过120%（交强及商业险连续三年未出险除外）｜含损两率>140%｜含损违章评分>90分｜商业险NCD等级≥2';
                 if (insuranceType === '单交强') {
-                    note = '搭售D区交通意外险（河南专属）(02703073005001)--特惠款 保费60元，费用价税分离30%；' + underwriting;
+                    note = '搭售D区交通意外险（河南专属）(02703073005001)--特惠款 保费60元，费用价税分离30%';
                 } else if (isTransfer === '是') {
-                    note = '交三不用加非车；' + underwriting;
+                    note = '交三不用加非车';
                 } else {
-                    note = '交三不用加非车；含损搭售B区交通工具意外险(G0514)--升级款 保费200元，费用价税分离30%；不按要求保费搭售非车商业0费用；' + underwriting;
+                    note = '交三不用加非车；含损搭售B区交通工具意外险(G0514)--升级款 保费200元，费用价税分离30%；不按要求保费搭售非车商业0费用';
                 }
             } else if (company === '锦泰') {
                 if (vehicleType === '特种车') {
