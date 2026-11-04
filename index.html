@@ -818,7 +818,7 @@
                     <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
                 </svg>
             </button>
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-10-31 11:12</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-11-04 08:41</span>
         </div>
     </nav>
 
@@ -961,7 +961,7 @@
                         <label for="underwritingCondition">承保条件</label>
                         <select id="underwritingCondition">
                             <option value="常规车型">常规车型</option>
-                            <option value="非常规车型">非常规车型（多用途旅行车｜过户车｜新车）</option>
+                            <option value="非常规车型">非常规车型（多用途旅行车｜过户车｜平台新保）</option>
                         </select>
                     </div>
                     <div class="field" id="tiananScoreField" style="display:none;">
@@ -1005,7 +1005,7 @@
         <p>© 2026 小钱Car-insurance查询</p>
     </footer>
 
-    <script src="rates.js?v=20261031-1"></script>
+    <script src="rates.js?v=20261104-2"></script>
     <script>
         // 明亮 / 暗黑模式切换；主题已在 <head> 内提前应用，这里只负责绑定交互与持久化
         (function () {
@@ -1796,8 +1796,8 @@
                     if (city === '开封' || city === '平顶山') {
                         note += '；禁单交、禁单商、禁交商含损类，仅承保交三';
                     }
-                    if (city === '驻马店') {
-                        note += '；禁单交';
+                    if (city === '郑州' || city === '驻马店') {
+                        note += '；家用车平台新保看NCD系数是1的话，系统是转保的也属于平台新保，按非常规车型费用出单';
                     }
                 } else if (vehicleType === '非营运企事业客车/救护车') {
                     note += '；投保人被保险人及车主三方一致；县级以上公立医院可保；按单位客车承保，三责限100万；含损需车价25万以内且自主系数1.35-1.5';
