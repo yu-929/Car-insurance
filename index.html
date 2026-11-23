@@ -818,7 +818,7 @@
                     <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
                 </svg>
             </button>
-            <span class="nav-updated" id="lastUpdated">最后更新：2026-11-20 19:14</span>
+            <span class="nav-updated" id="lastUpdated">最后更新：2026-11-23 10:51</span>
         </div>
     </nav>
 
@@ -1924,6 +1924,9 @@
                 const tiananScore = tiananEl ? tiananEl.value : '30分以上';
                 if (effBusinessType === '续保' && tiananScore === '40分以上') {
                     note += '；续保业务40分以上（含单商、交商）可续保前3天（28-30天）内加2%';
+                }
+                if (vehicleType === '非营运客车' && effBusinessType !== '新车') {
+                    note += '；爆点活动：家用燃油旧车天马30分以上商业险费用+3%（转保/续保均执行）';
                 }
                 note += '；驾乘费用：219元以下25%，139元驾乘20%，219元及以上40%';
             } else if (company === '紫金') {
